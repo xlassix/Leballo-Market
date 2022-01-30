@@ -14,6 +14,7 @@
     "autoprefixer": "^10.4.2",
     "axios": "^0.25.0",
     "chai": "^4.3.6",
+    "dotenv": "^14.3.2",
     "ether": "^0.0.9",
     "ethereum-waffle": "^3.4.0",
     "hardhat": "^2.8.3",
