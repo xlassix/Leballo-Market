@@ -22,16 +22,21 @@ describe("Nft market", async function () {
     let token2 = await nft.createToken(
       "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_92x30dp.png"
     );
+    let tx1=await token1.wait()
+    let tx2=await token2.wait()
+
+    let tokenId1 =tx1.events[0].args[2].toNumber()
+    let tokenId2 =tx2.events[0].args[2].toNumber()
 
 
     const auction_price = ethers.utils.parseUnits("100", "ether");
 
 
-    await market.createMarketItem(nftMarketAddress, 1, auction_price, {
+    await market.createMarketItem(nftMarketAddress, tokenId1, auction_price, {
       value: listingPrice,
     });
 
-    await market.createMarketItem(nftMarketAddress, 2, auction_price, {
+    await market.createMarketItem(nftMarketAddress, tokenId2, auction_price, {
       value: listingPrice,
     });
 
