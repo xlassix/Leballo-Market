@@ -1,6 +1,7 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Profile from "../components/profile";
+
 export default function AccountPage() {
   return (
     <>

@@ -1,5 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
-require('dotenv').config()
+require('dotenv').config({path:".env.local"})
 const project_id = process.env.project_id
 const private_key = process.env.private_key
 
