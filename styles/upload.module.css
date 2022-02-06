@@ -1,0 +1,7 @@
+.upload{
+  display: block;
+}
+.upload>input{
+  width: 100%;
+  margin: 1rem ;
+}
