@@ -12,14 +12,15 @@ contract NFT is ERC721URIStorage{
 
     constructor(address marketplace) ERC721("Leballo Tokens","lebs"){
         contractAddress = marketplace;
+        setApprovalForAll(contractAddress,true);
     }
 
     function createToken(string memory uri) external returns (uint256){
         _tokenIds.increment();
         uint256 newTokenId=_tokenIds.current();
-
         _mint(msg.sender,newTokenId);
         _setTokenURI(newTokenId,uri);
+        approve(contractAddress,newTokenId);
         setApprovalForAll(contractAddress,true);
         return newTokenId;
     }

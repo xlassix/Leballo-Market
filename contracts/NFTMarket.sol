@@ -86,9 +86,9 @@ contract NFTMarket is ReentrancyGuard {
     function createMarketItemSale(address nftContract, uint256 itemId)
         public
         payable
-        nonReentrant
+        returns(MarketItem memory)
     {
-        MarketItem storage currentToken = itemIdToMarketItem[itemId];
+        MarketItem memory currentToken = itemIdToMarketItem[itemId];
         uint256 price = currentToken.price;
         uint256 tokenId = currentToken.tokenId;
         require(msg.value >= price, "kindly transfer the listed price");
@@ -99,16 +99,18 @@ contract NFTMarket is ReentrancyGuard {
         _itemsSold.increment();
         currentToken.seller.transfer(price);
         _owner.transfer(listingPrice);
+        itemIdToMarketItem[itemId]=currentToken;
         emit MarketItemEvent(
             itemId,
             tokenId,
             nftContract,
-            currentToken.owner,
-            currentToken.seller,
+            itemIdToMarketItem[itemId].owner,
+            itemIdToMarketItem[itemId].seller,
             price,
             MarketItemStatus.Sold,
             "Transferred NFT"
         );
+        return currentToken;
     }
 
     function listItem(address nftContract, uint256 itemId,uint256 price)
@@ -118,7 +120,7 @@ contract NFTMarket is ReentrancyGuard {
         MarketItem storage currentToken = itemIdToMarketItem[itemId];
         uint256 tokenId = currentToken.tokenId;
         require(msg.value >= listingPrice , "kindly transfer the listed price");
-        require(payable(msg.sender) == payable(currentToken.owner), "you mustmust be the owner");
+        require(payable(msg.sender) == payable(currentToken.owner), "you must must be the owner");
         currentToken.price=price;
 
         IERC721(nftContract).transferFrom(msg.sender,address(this), tokenId);
