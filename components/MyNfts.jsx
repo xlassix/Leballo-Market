@@ -12,13 +12,14 @@ import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 export default function MyNfts() {
   const nftPerPage = 20;
   const [showModal, setModal] = useState();
+  const [loading, setloading] = useState(false);
   const [page, setPage] = useState(1);
   function toggleData() {
     setModal(!showModal);
   }
   const router = useRouter();
   const [nfts, setNfts] = useState([]);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
 
   useEffect(() => {
     loadNfts();
@@ -63,7 +64,7 @@ export default function MyNfts() {
   }
 
   async function listNft(nft, sell_price) {
-    console.log(nft, sell_price)
+    setLoaded(false);
     const web3Model = new Web3Modal();
     const connection = await web3Model.connect();
     const provider = new ethers.providers.Web3Provider(connection);
@@ -83,6 +84,7 @@ export default function MyNfts() {
     });
     let tx = await transaction.wait();
     tx.events[0]["transactionHash"];
+    setLoaded(true)
     router.push("/")
   }
   return (
@@ -94,7 +96,7 @@ export default function MyNfts() {
       ) : (
         <section id="my-nfts">
           {nfts.map((nft, i) => {
-            return <MyNftCard nft={nft} key={i} listFunc={async(e)=>{await listNft(nft,e)}}/>;
+            return <MyNftCard nft={nft} status={loading} key={i} listFunc={async(e)=>{await listNft(nft,e)}}/>;
           })}
         </section>
       )}

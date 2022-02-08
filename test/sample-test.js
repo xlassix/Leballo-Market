@@ -102,7 +102,7 @@ describe("Nft market", async function () {
 
     let tokenId1 = tx1.events[0].args[2].toNumber();
     let tokenId2 = tx2.events[0].args[2].toNumber();
-    console.debug(tx2.events[0]['transactionHash'])
+    console.debug(tx2.events[0]["transactionHash"]);
     const auction_price = ethers.utils.parseUnits("100", "ether");
 
     await market.createMarketItem(nftMarketAddress, tokenId1, auction_price, {
@@ -130,61 +130,70 @@ describe("Nft market", async function () {
     //   )
     // );
 
-
     const [sellerAddress, buyerAddress] = await ethers.getSigners();
 
-    console.debug({"buyer":buyerAddress.address})
-    let data =await market
+    console.debug({ buyer: buyerAddress.address });
+    let data = await market
       .connect(buyerAddress)
       .createMarketItemSale(nftMarketAddress, 1, { value: auction_price });
 
-    data = await data.wait()
+    data = await data.wait();
 
-    console.debug({"data":data})
+    console.debug({ data: data });
 
     let test_func = async (i) => {
-      console.debug(i.events[2])
-        let result=i.events[2].args
-        const tokenURI = await nft.tokenURI(result.tokenId.toString());
-        console.debug({"dataz":tokenURI})
-        return {
-          tokenURI,
-          contract:result.nftContract,
-          price: result.price.toString(),
-          tokenId: result.tokenId.toString(),
-          seller: result.seller,
-          owner: result.owner,
-        };
-      }
-    let datax= await test_func(data)
-    console.debug({datax,"buyer":buyerAddress.address,"kk":datax.contract})
+      console.debug(i.events[2]);
+      let result = i.events[2].args;
+      const tokenURI = await nft.tokenURI(result.tokenId.toString());
+      console.debug({ dataz: tokenURI });
+      return {
+        tokenURI,
+        contract: result.nftContract,
+        price: result.price.toString(),
+        tokenId: result.tokenId.toString(),
+        seller: result.seller,
+        owner: result.owner,
+      };
+    };
+    let datax = await test_func(data);
+    console.debug({ datax, buyer: buyerAddress.address, kk: datax.contract });
 
-
-    console.debug({nftMarketAddress,"dddd": datax.tokenId})
-    let dataxx=await nft.ownerOf(datax.tokenId)
+    console.debug({ nftMarketAddress, dddd: datax.tokenId });
+    let dataxx = await nft.ownerOf(datax.tokenId);
     // dataxx = await dataxx.wait()
 
-    console.debug({"knjkjb":dataxx,"owner":buyerAddress.address==dataxx})
+    console.debug({ knjkjb: dataxx, owner: buyerAddress.address == dataxx });
 
-    // let xx= await nft.requestTransfer(buyerAddress.address,marketplaceAddress, datax.tokenId,{from:(buyerAddress.address).toString()});   
+    // let xx= await nft.requestTransfer(buyerAddress.address,marketplaceAddress, datax.tokenId,{from:(buyerAddress.address).toString()});
     // let _mine=await xx.wait()
 
     // console.debug({_mine})
 
-    let bh= (await nft.ownerOf(datax.tokenId))
-    let dataxy=await nft.(marketplaceAddress, datax.tokenId);
+    // let bh= (await nft.ownerOf(datax.tokenId))
+    // let dataxy=await nft.approve(marketplaceAddress, datax.tokenId);
 
     // console.debug(dataxy)
 
-    await net
+    data = await market
       .connect(buyerAddress)
-      .listItem(nftMarketAddress, datax.tokenId, auction_price,{value: listingPrice,});
+      .listItem(nftMarketAddress, datax.tokenId, auction_price, {
+        value: listingPrice,
+      });
+    tx = await data.wait();
+    console.log({ data });
+    data = await market
+      .connect(sellerAddress)
+      .BuyMarketItem(nftMarketAddress, datax.tokenId,{value:auction_price});
 
-    // console.debug("data",market)
+    tx = await data.wait();
+    console.log({"da": data });
+
+    console.debug(sellerAddress.address)
+    
     console.debug(
       await Promise.all(
         (
-          await market.fetchMyNfts(20)
+          await market.connect(sellerAddress).fetchMyNfts(20)
         ).map(async (i) => {
           const tokenURI = await nft.tokenURI(i.tokenId);
           return {

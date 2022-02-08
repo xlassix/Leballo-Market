@@ -1,6 +1,6 @@
 import Modal from "./Modal";
 import { useState } from "react";
-export default function MyNftCard({ nft ,listFunc}) {
+export default function MyNftCard({ nft, listFunc, loading }) {
   const [showModal, setModal] = useState(false);
   const [sellingPrice, setSellingPrice] = useState();
   function toggleData() {
@@ -40,24 +40,38 @@ export default function MyNftCard({ nft ,listFunc}) {
           </div>
         </figcaption>
       </figure>
-      {showModal ? 
+      {showModal ? (
         <Modal>
-        <form className="upload">
-          <a onClick={() => toggleData()} style={{fontSize:"2rem",textAlign:"right"}}>&times;</a>
-            <input
-              placeholder="Asset Price"
-              type="number"
-              required
-              onChange={(e) =>
-                setSellingPrice(e.target.value)
-              }
-            />
-            <div className="center">
-            <a onClick={async() => await listFunc(sellingPrice)} className="rounded-button">list</a>
-            </div>
+          <form className="upload">
+            <a
+              onClick={() => toggleData()}
+              style={{ fontSize: "2rem", textAlign: "right" }}
+            >
+              &times;
+            </a>
+            {loading ? (
+              <>
+                <input
+                  placeholder="Asset Price"
+                  type="number"
+                  required
+                  onChange={(e) => setSellingPrice(e.target.value)}
+                />
+                <div className="center">
+                  <a
+                    onClick={async () => await listFunc(sellingPrice)}
+                    className="rounded-button"
+                  >
+                    list
+                  </a>
+                </div>
+              </>
+            ) : (
+              <p>Loading</p>
+            )}
           </form>
         </Modal>
-    : null}
+      ) : null}
     </>
   );
 }
