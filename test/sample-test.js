@@ -131,7 +131,7 @@ describe("Nft market", async function () {
     // );
 
 
-    const [sell, buyerAddress] = await ethers.getSigners();
+    const [sellerAddress, buyerAddress] = await ethers.getSigners();
 
     console.debug({"buyer":buyerAddress.address})
     let data =await market
@@ -161,14 +161,24 @@ describe("Nft market", async function () {
 
 
     console.debug({nftMarketAddress,"dddd": datax.tokenId})
-    let dataxx=await nft.approve(buyerAddress.address, datax.tokenId);
-    dataxx = await dataxx.wait()
+    let dataxx=await nft.ownerOf(datax.tokenId)
+    // dataxx = await dataxx.wait()
 
-    console.debug(dataxx)
+    console.debug({"knjkjb":dataxx,"owner":buyerAddress.address==dataxx})
 
-    await market
+    // let xx= await nft.requestTransfer(buyerAddress.address,marketplaceAddress, datax.tokenId,{from:(buyerAddress.address).toString()});   
+    // let _mine=await xx.wait()
+
+    // console.debug({_mine})
+
+    let bh= (await nft.ownerOf(datax.tokenId))
+    let dataxy=await nft.(marketplaceAddress, datax.tokenId);
+
+    // console.debug(dataxy)
+
+    await net
       .connect(buyerAddress)
-      .listItem(nftMarketAddress, 1, auction_price,{value: listingPrice,});
+      .listItem(nftMarketAddress, datax.tokenId, auction_price,{value: listingPrice,});
 
     // console.debug("data",market)
     console.debug(

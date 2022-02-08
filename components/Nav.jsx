@@ -2,8 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import CreateNft from "./createItems";
 
-function Nav({ isAdmin }) {
-  console.log(isAdmin);
+function Nav({ isAdmin,connection }) {
+  console.log(isAdmin,connection);
   const [mobileNavIconVisibility, setMobileNavIconVisibility] = useState(false);
   const [mobileNavVisibility, setMobileNavVisibility] = useState(false);
   function toggleNavVisiblity() {
@@ -51,7 +51,7 @@ function Nav({ isAdmin }) {
           )}
           </li>
           <li>
-            <a className="rounded-button">Connect Wallet</a>
+            <a className="rounded-button" >{connection ? `${connection.selectedAddress.substring(0,6)}...${connection.selectedAddress.substr(-5)}` :"Connect Wallet"}</a>
           </li>
           <svg
             className={
@@ -87,7 +87,7 @@ function Nav({ isAdmin }) {
           )}
         </li>
         <li>
-          <a href="#">Connect Wallet</a>
+          <a href="#">{connection ? connection.selectedAddress.substring(0,6) :"Connect Wallet"}</a>
         </li>
       </ol>
     </>

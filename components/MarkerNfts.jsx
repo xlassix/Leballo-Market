@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { ethers } from "ethers";
 import axios from "axios";
-import Web3Modal from "web3modal";
 import MarketNftCard from "./MarketNftCard";
 import { nftAddress, nftMarketPlaceAddress } from "../config";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 
-export default function MarketNfts() {
+export default function MarketNfts({connection}) {
   const nftPerPage=20
   const [showModal, setModal] = useState();
   const [page, setPage] = useState(1);
@@ -56,8 +55,6 @@ export default function MarketNfts() {
   }
 
   async function buyNfts(nft) {
-    const web3Model = new Web3Modal();
-    const connection = await web3Model.connect();
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
 
@@ -107,7 +104,12 @@ export default function MarketNfts() {
             </svg>{" "}
             Filter
           </button>
-        </div>
+        </div>{
+          loaded === false? 
+          <p style={{ textAlign: "center", padding: "7rem 0" }}>
+            Loading MarketNfts .....
+          </p>:null
+        }
         {nfts.length === 0 && loaded === true ? (
           <p style={{ textAlign: "center", padding: "7rem 0" }}>
             No Available Nfts
@@ -122,29 +124,6 @@ export default function MarketNfts() {
           </div>
         )}
       </section>
-      {!showModal ? (
-        <p>
-          No thing to show{" "}
-          <a href="#" onClick={() => toggleData()}>
-            545
-          </a>
-        </p>
-      ) : (
-        <Modal>
-          <a onClick={() => toggleData()}>&times;</a>
-          <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industrys standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.{" "}
-          </p>
-        </Modal>
-      )}
     </div>
   );
 }

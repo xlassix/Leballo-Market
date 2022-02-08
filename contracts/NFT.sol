@@ -9,10 +9,21 @@ contract NFT is ERC721URIStorage{
     Counters.Counter private _tokenIds;
     address contractAddress;
 
-
     constructor(address marketplace) ERC721("Leballo Tokens","lebs"){
         contractAddress = marketplace;
-        setApprovalForAll(contractAddress,true);
+    }
+
+
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override {
+        //solhint-disable-next-line max-line-length
+        require(_isApprovedOrOwner(from, tokenId), "ERC721: transfer caller is not owner nor approved");
+
+        _transfer(from, to, tokenId);
     }
 
     function createToken(string memory uri) external returns (uint256){
@@ -20,7 +31,6 @@ contract NFT is ERC721URIStorage{
         uint256 newTokenId=_tokenIds.current();
         _mint(msg.sender,newTokenId);
         _setTokenURI(newTokenId,uri);
-        approve(contractAddress,newTokenId);
         setApprovalForAll(contractAddress,true);
         return newTokenId;
     }
