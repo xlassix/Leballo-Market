@@ -122,8 +122,6 @@ contract NFTMarket is ReentrancyGuard {
         require(msg.value >= listingPrice , "kindly transfer the listed price");
         require(payable(msg.sender) == payable(currentToken.owner), "you must must be the owner");
         currentToken.price=price;
-        IERC721(nftContract).approve(IERC721(nftContract).ownerOf(tokenId), tokenId);
-        IERC721(nftContract).safeTransferFrom(IERC721(nftContract).ownerOf(tokenId),address(this), tokenId);
         _currentListings.increment();
         emit MarketItemEvent(
             itemId,
