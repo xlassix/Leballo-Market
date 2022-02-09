@@ -19,7 +19,8 @@ const client = ipfs_client({
 
 export default function CreateNft() {
   const [showModal, setModal] = useState();
-  const [uploaded, setIsUploading] = useState(true);
+  const [uploaded, setIsUploaded] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const router = useRouter();
   function toggleData() {
@@ -27,20 +28,36 @@ export default function CreateNft() {
   }
   const [fileUrl, setFileUrl] = useState(null);
   const [formData, setFormData] = useState({
-    price: "",
-    name: "",
-    description: "",
+    price: null,
+    name: null,
+    description: null,
   });
 
+  async function HandleSubmit(e){
+      e.preventDefault();
+      e.preventDefault();
+      setLoading(true)
+      console.log("clicked");
+      await createItem(e);
+      toggleData();
+      setFormData({
+        price: null,
+        name: null,
+        description: null,
+      })
+      setLoading(false)
+  }
+
   async function fileHandler(e) {
-    setIsUploading(false);
+    setIsUploaded(false);
     const file = e.target.files[0];
     let file_size = e.target.files[0].size;
     try {
       const _added = await client.add(file, {
         progress: (prog) => {
           console.log(prog, file_size);
-          setIsUploading(prog == file_size);
+          setIsUploaded(prog == file_size);
+          setProgress(prog/file_size)
         },
       });
       setFileUrl(`https://ipfs.infura.io/ipfs/${_added.path}`);
@@ -100,48 +117,62 @@ export default function CreateNft() {
       </a>
       {showModal ? (
         <Modal>
-          <form className="upload">
-          <a onClick={() => toggleData()} style={{fontSize:"2rem",textAlign:"right"}}>&times;</a>
-            <input
-              placeholder="Asset Name"
-              required
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-            <textarea
-              placeholder="Asset Description"
-              required
-              onChange={(e) => {
-                setFormData({ ...formData, description: e.target.value });
-              }}
-            />
-            <input
-              placeholder="Asset Price"
-              type="number"
-              required
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-            />
-            <input placeholder="Asset" type="file" onChange={fileHandler} />
-            <div className="center">
-              {uploaded ? (
-                <a
-                  className="rounded-button"
-                  required
-                  onClick={(e) => {
-                    console.log("clicked");
-                    createItem(e);
-                  }}
-                >
-                  Create Nft
-                </a>
-              ) : (
-                <a>Uploading.....</a>
-              )}
-            </div>
-          </form>
+          {!loading ? (
+            <form className="upload">
+              <a
+                onClick={() => toggleData()}
+                style={{ fontSize: "2rem", textAlign: "right" }}
+              >
+                &times;
+              </a>
+              <input
+                placeholder="Asset Name"
+                required={true}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+              <textarea
+                placeholder="Asset Description"
+                required={true}
+                onChange={(e) => {
+                  setFormData({ ...formData, description: e.target.value });
+                }}
+              />
+              <input
+                placeholder="Asset Price"
+                type="number"
+                required={true}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+              />
+              <input placeholder="Asset" type="file" onChange={fileHandler} required={true} />
+              <div className="center">
+                {uploaded ? (
+                  <button
+                    className="rounded-button"
+                    type="button"
+                    onClick={HandleSubmit}
+                    onSubmit={HandleSubmit}
+                    disabled={
+                      progress==1.0
+                      & formData.description 
+                      &(formData.price && /^\d+$/.test(formData.price))
+                      &formData.name}
+                  >
+                    Create Nft
+                  </button>
+                ) : (
+                  <a>Uploading.....</a>
+                )}
+              </div>
+            </form>
+          ) : (
+            <p style={{ textAlign: "center", padding: "7rem" }}>
+              Processing....
+            </p>
+          )}
         </Modal>
       ) : null}
     </>

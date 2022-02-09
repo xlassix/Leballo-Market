@@ -1143,7 +1143,17 @@ footer form input {
   display: block;
   margin-bottom: 2rem;
 }
-@media (max-width: 950px) {
+.rounded-button:disabled{
+  --text-color: var(--color-light-btn2);
+  --body-color: var( --color-dark-text);
+  --border-color: none
+}
+.rounded-button:disabled:hover{
+  --body-color: var(--color-light-btn2);
+  --text-color:var( --color-dark-text); 
+  --border-color: none
+}
+  @media (max-width: 950px) {
   #top-collection {
     flex-basis: 100%;
   }

@@ -1,8 +1,9 @@
 import Modal from "./Modal";
 import { useState } from "react";
-export default function MyNftCard({ nft, listFunc, loading }) {
+export default function MyNftCard({ nft, listFunc }) {
   const [showModal, setModal] = useState(false);
   const [sellingPrice, setSellingPrice] = useState();
+  const [loading, setLoading] = useState(true);
   function toggleData() {
     console.log(showModal);
     setModal(!showModal);
@@ -59,7 +60,10 @@ export default function MyNftCard({ nft, listFunc, loading }) {
                 />
                 <div className="center">
                   <a
-                    onClick={async () => await listFunc(sellingPrice)}
+                    onClick={async () => {
+                      setLoading(true);
+                      await listFunc(sellingPrice);
+                    }}
                     className="rounded-button"
                   >
                     list
@@ -67,7 +71,9 @@ export default function MyNftCard({ nft, listFunc, loading }) {
                 </div>
               </>
             ) : (
-              <p>Loading</p>
+              <p style={{ textAlign: "center", padding: "7rem 0" }}>
+                Processing...
+              </p>
             )}
           </form>
         </Modal>

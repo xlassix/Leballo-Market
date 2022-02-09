@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 contract NFTMarket is ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _itemsIds;
-    Counters.Counter private _itemsSold;
+    Counters.Counter private _nftMarketCount;
     Counters.Counter private _currentListings;
     address payable _owner;
     uint256 listingPrice = 0.025 ether;
@@ -56,6 +56,7 @@ contract NFTMarket is ReentrancyGuard {
     ) public payable nonReentrant {
         require(price > 0, "Item Price most be greater then 1 WEI");
         require(msg.value >= listingPrice, "Insufficent listing fee");
+        require(tokenId>=_itemsIds.current(),"invalid Token");
 
         _itemsIds.increment();
         uint256 currentItemId = _itemsIds.current();
@@ -128,7 +129,7 @@ contract NFTMarket is ReentrancyGuard {
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
         currentToken.status = MarketItemStatus.Sold;
         currentToken.owner = payable(msg.sender);
-        _itemsSold.increment();
+        _nftMarketCount.increment();
         currentToken.seller.transfer(price);
         _owner.transfer(listingPrice);
         itemIdToMarketItem[itemId] = currentToken;
@@ -194,9 +195,10 @@ contract NFTMarket is ReentrancyGuard {
         returns (MarketItem[] memory)
     {
         uint256 itemCount = _itemsIds.current();
-        uint256 unsoldItemCount = itemCount - _itemsSold.current();
+        uint256 unsoldItemCount = itemCount + _currentListings.current() - _nftMarketCount.current();
         uint256 currentIndex = 0;
         uint256 _min = Math.min(limit, unsoldItemCount);
+
 
         MarketItem[] memory unsoldItem = new MarketItem[](_min);
 
@@ -205,7 +207,6 @@ contract NFTMarket is ReentrancyGuard {
                 break;
             }
             if (
-                itemIdToMarketItem[index + 1].owner == address(0) ||
                 itemIdToMarketItem[index + 1].status == MarketItemStatus.Active
             ) {
                 MarketItem memory currentItem = itemIdToMarketItem[index + 1];

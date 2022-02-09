@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Intro from "../components/Intro";
 import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect,useEffect } from "react";
 
 export default function Home() {
   const [connection, setConnection] = useState(null);
@@ -21,10 +21,10 @@ export default function Home() {
     }
   }
 
+
   useEffect(async () => {
     await connect();
-  }, [connection]);
-
+  }, [connect]);
   return (
     <>
       <Nav connection={connection} />
