@@ -77,15 +77,6 @@ function Nav({ isAdmin,connection }) {
         <li>
           <a href="#">About</a>
         </li>
-        <li>
-          {isAdmin===true ? (
-            <CreateNft />
-          ) : (
-            <Link href="/account">
-              <a>My Account</a>
-            </Link>
-          )}
-        </li>
       </ol>
     </>
   );
