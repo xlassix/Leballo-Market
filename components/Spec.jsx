@@ -61,7 +61,7 @@ export default function Spec(){
         </div>
         <div id="list-featured">
           <article>
-            <img  className="rounded-corners" src="./img/Asset 1.png" />
+            <img  className="rounded-corners" src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG" />
             <div className="flex">
               <h6>The Song Title</h6>
               <div className="flex flex-sb">
@@ -82,7 +82,7 @@ export default function Spec(){
             </div>
           </article>
           <article>
-            <img className="rounded-corners" src="./img/Asset 1.png" />
+            <img className="rounded-corners" src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG" />
             <div className="flex">
               <h6>The Song Title</h6>
               <div className="flex flex-sb">
@@ -103,7 +103,7 @@ export default function Spec(){
             </div>
           </article>
           <article>
-            <img className="rounded-corners" src="./img/Asset 1.png" />
+            <img className="rounded-corners" src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG" />
             <div className="flex">
               <h6>The Song Title</h6>
               <div className="flex flex-sb">

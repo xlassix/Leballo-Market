@@ -28,9 +28,9 @@ export default function CreateNft() {
   }
   const [fileUrl, setFileUrl] = useState(null);
   const [formData, setFormData] = useState({
-    price: null,
-    name: null,
-    description: null,
+    price: "",
+    name: "",
+    description: "",
   });
 
   async function HandleSubmit(e){
@@ -41,9 +41,9 @@ export default function CreateNft() {
       await createItem(e);
       toggleData();
       setFormData({
-        price: null,
-        name: null,
-        description: null,
+        price: "",
+        name: "",
+        description: "",
       })
       setLoading(false)
   }
@@ -156,10 +156,11 @@ export default function CreateNft() {
                     onClick={HandleSubmit}
                     onSubmit={HandleSubmit}
                     disabled={
-                      progress==1.0
-                      & formData.description 
-                      &(formData.price && /^\d+$/.test(formData.price))
-                      &formData.name}
+                      !(progress==1.0)
+                      & !(formData.description.length==0)
+                      & !(formData.price && /^\d+$/.test(formData.price))
+                      & !(formData.name.length!=0)
+                    }
                   >
                     Create Nft
                   </button>

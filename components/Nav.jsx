@@ -86,9 +86,6 @@ function Nav({ isAdmin,connection }) {
             </Link>
           )}
         </li>
-        <li>
-          <a href="#">{connection ? connection.selectedAddress.substring(0,6) :"Connect Wallet"}</a>
-        </li>
       </ol>
     </>
   );

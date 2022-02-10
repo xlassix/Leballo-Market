@@ -308,5 +308,23 @@ describe("Nft market", async function () {
         })
       )
     );
+
+
+    console.debug(
+      await Promise.all(
+        (
+          await market.connect(sellerAddress).getLastMinted(20)
+        ).map(async (i) => {
+          const tokenURI = await nft.tokenURI(i.tokenId);
+          return {
+            tokenURI,
+            price: i.price.toString(),
+            tokenId: i.tokenId.toString(),
+            seller: i.seller,
+            owner: i.owner,
+          };
+        })
+      )
+    );
   });
 });

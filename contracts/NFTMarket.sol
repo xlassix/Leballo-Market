@@ -56,7 +56,7 @@ contract NFTMarket is ReentrancyGuard {
     ) public payable nonReentrant {
         require(price > 0, "Item Price most be greater then 1 WEI");
         require(msg.value >= listingPrice, "Insufficent listing fee");
-        require(tokenId>=_itemsIds.current(),"invalid Token");
+        require(tokenId >= _itemsIds.current(), "invalid Token");
 
         _itemsIds.increment();
         uint256 currentItemId = _itemsIds.current();
@@ -83,26 +83,26 @@ contract NFTMarket is ReentrancyGuard {
         );
     }
 
-    function BuyMarketItem(
-        address nftContract,
-        uint256 tokenId
-    ) public payable nonReentrant returns (MarketItem memory) {
-
-        MarketItem memory item = getItemByTokenId(tokenId);
+    function BuyMarketItem(address nftContract, uint256 tokenId)
+        public
+        payable
+        nonReentrant
+        returns (MarketItem memory)
+    {
+        MarketItem memory item = itemIdToMarketItem[getItemByTokenId(tokenId)];
         require(
             item.status == MarketItemStatus.Active,
             "Items That aint Listed cant be Solded"
         );
         require(msg.value >= item.price, "Insufficent funds");
 
-
         IERC721(nftContract).transferFrom(item.owner, msg.sender, tokenId);
         _currentListings.decrement();
         item.owner.transfer(item.price);
-        item.status=MarketItemStatus.Sold;
-        item.owner=payable(msg.sender);
-        itemIdToMarketItem[item.itemId]=item;
-    
+        item.status = MarketItemStatus.Sold;
+        item.owner = payable(msg.sender);
+        itemIdToMarketItem[item.itemId] = item;
+
         emit MarketItemEvent(
             item.itemId,
             tokenId,
@@ -119,6 +119,7 @@ contract NFTMarket is ReentrancyGuard {
     function createMarketItemSale(address nftContract, uint256 itemId)
         public
         payable
+        nonReentrant
         returns (MarketItem memory)
     {
         MarketItem memory currentToken = itemIdToMarketItem[itemId];
@@ -157,10 +158,13 @@ contract NFTMarket is ReentrancyGuard {
             payable(msg.sender) == payable(currentToken.owner),
             "you must must be the owner"
         );
-        require(currentToken.status==MarketItemStatus.Sold,"Cant list that is already Listed");
+        require(
+            currentToken.status == MarketItemStatus.Sold,
+            "Cant list that is already Listed"
+        );
         require(msg.value >= listingPrice, "kindly transfer the listed price");
         currentToken.price = price;
-        currentToken.status=MarketItemStatus.Active;
+        currentToken.status = MarketItemStatus.Active;
         _currentListings.increment();
         emit MarketItemEvent(
             itemId,
@@ -176,17 +180,44 @@ contract NFTMarket is ReentrancyGuard {
 
     function getItemByTokenId(uint256 tokenId)
         internal
-        returns (MarketItem memory)
+        returns (uint)
     {
         uint256 itemCount = _itemsIds.current();
         for (uint256 index = 0; index < itemCount; index++) {
-            if (
-                itemIdToMarketItem[index + 1].tokenId == tokenId
-            ) {
-                return itemIdToMarketItem[index + 1];
+            if (itemIdToMarketItem[index + 1].tokenId == tokenId) {
+                return itemIdToMarketItem[index + 1].itemId;
             }
         }
-        require(false,"Invalid Token ID");
+        require(false, "Invalid Token ID");
+    }
+
+    function getLastMinted(uint256 limit)
+        public
+        view
+        returns (MarketItem[] memory)
+    {
+        uint256 itemCount = _itemsIds.current();
+        uint256 unsoldItemCount = itemCount +
+            _currentListings.current() -
+            _nftMarketCount.current();
+        uint256 currentIndex = 0;
+        uint256 _min = Math.min(limit, unsoldItemCount);
+
+        MarketItem[] memory unsoldItem = new MarketItem[](_min);
+
+        for (uint index = itemCount; index > 0; index--) {
+            if (currentIndex == _min) {
+                break;
+            }
+            if (
+                itemIdToMarketItem[index].status == MarketItemStatus.Active
+            ) {
+                MarketItem memory currentItem = itemIdToMarketItem[index];
+                unsoldItem[currentIndex] = currentItem;
+                currentIndex++;
+            }
+        }
+        return unsoldItem;
     }
 
     function getMarketItems(uint256 limit)
@@ -195,10 +226,11 @@ contract NFTMarket is ReentrancyGuard {
         returns (MarketItem[] memory)
     {
         uint256 itemCount = _itemsIds.current();
-        uint256 unsoldItemCount = itemCount + _currentListings.current() - _nftMarketCount.current();
+        uint256 unsoldItemCount = itemCount +
+            _currentListings.current() -
+            _nftMarketCount.current();
         uint256 currentIndex = 0;
         uint256 _min = Math.min(limit, unsoldItemCount);
-
 
         MarketItem[] memory unsoldItem = new MarketItem[](_min);
 
