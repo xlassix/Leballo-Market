@@ -21,6 +21,7 @@
     "ethereum-waffle": "^3.4.0",
     "hardhat": "^2.8.3",
     "ipfs-http-client": "^56.0.0",
+    "is-plain-object": "^5.0.0",
     "next": "12.0.9",
     "postcss": "^8.4.5",
     "react": "17.0.2",

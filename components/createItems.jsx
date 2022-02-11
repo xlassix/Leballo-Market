@@ -160,7 +160,7 @@ export default function CreateNft() {
                     disabled={
                       !(progress==1.0)
                       || (formData.description.length==0)
-                      || !( /^\d+$/.test(formData.price))
+                      || !( /^\d+$|(\d+[.]\d+)$/.test(formData.price))
                       || (formData.name.length==0)
                     }
                   >

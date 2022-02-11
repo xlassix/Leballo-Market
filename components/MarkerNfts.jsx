@@ -2,18 +2,25 @@ import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { ethers } from "ethers";
 import axios from "axios";
+import Web3Modal from "web3modal";
 import MarketNftCard from "./MarketNftCard";
 import { nftAddress, nftMarketPlaceAddress } from "../config";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 
-export default function MarketNfts({connection}) {
-  const nftPerPage=20
+export default function MarketNfts() {
+  const nftPerPage = 20;
   const [showModal, setModal] = useState();
   const [page, setPage] = useState(1);
   function toggleData() {
     setModal(!showModal);
   }
+  const [errorInstance, setErrorInstance] = useState({
+    status: false,
+    message: "",
+    subtitle: "",
+    count: 0,
+  });
   const [nfts, setNfts] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -22,14 +29,16 @@ export default function MarketNfts({connection}) {
   }, []);
 
   async function loadNfts() {
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.matic.today");
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://rpc-mumbai.matic.today"
+    );
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftMarketPlaceAddress,
       Market.abi,
       provider
     );
-    const data = await marketContract.getMarketItems(nftPerPage*page);
+    const data = await marketContract.getMarketItems(nftPerPage * page);
 
     const items = await Promise.all(
       data.map(async (elem) => {
@@ -55,29 +64,34 @@ export default function MarketNfts({connection}) {
   }
 
   async function buyNfts(nft) {
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    try {
+      const web3Model = new Web3Modal();
+      const connection = await web3Model.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
 
-    const contract = new ethers.Contract(
-      nftMarketPlaceAddress,
-      Market.abi,
-      signer
-    );
-    const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
+      const contract = new ethers.Contract(
+        nftMarketPlaceAddress,
+        Market.abi,
+        signer
+      );
+      const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
 
-    const transaction = await contract.createMarketItemSale(
-      nftAddress,
-      nft.tokenId,
-      {
-        value: price,
-      }
-    );
+      const transaction = await contract.createMarketItemSale(
+        nftAddress,
+        nft.tokenId,
+        {
+          value: price,
+        }
+      );
 
-    await transaction.wait();
+      await transaction.wait();
+    } catch (e) {
+      console.log(e.message)
+      setErrorInstance({ ...errorInstance, status: true, message: e.message,subtitle : e.data.message });
+    }
     loadNfts();
   }
-
-  console.log(nfts);
 
   return (
     <div className="bgcolor_lit_purple">
@@ -104,12 +118,12 @@ export default function MarketNfts({connection}) {
             </svg>{" "}
             Filter
           </button>
-        </div>{
-          loaded === false? 
+        </div>
+        {loaded === false ? (
           <p style={{ textAlign: "center", padding: "7rem 0" }}>
             Loading MarketNfts .....
-          </p>:null
-        }
+          </p>
+        ) : null}
         {nfts.length === 0 && loaded === true ? (
           <p style={{ textAlign: "center", padding: "7rem 0" }}>
             No Available Nfts
@@ -118,12 +132,40 @@ export default function MarketNfts({connection}) {
           <div id="nfts">
             {nfts.map((nft, i) => {
               return (
-                <MarketNftCard nft={nft} key={i} onPurchase={() => buyNfts(nft)} />
+                <MarketNftCard
+                  nft={nft}
+                  key={i}
+                  onPurchase={() => buyNfts(nft)}
+                />
               );
             })}
           </div>
         )}
       </section>
+      {errorInstance.status? (
+        <Modal>
+          <div className="upload">
+            <a
+              onClick={() => {
+                setErrorInstance({
+                  ...errorInstance,
+                  status: false,
+                  count: errorInstance.count + 1,
+                });
+              }}
+              style={{ fontSize: "2rem", textAlign: "right" }}
+            >
+              &times;
+            </a>
+            <h5 style={{ textAlign: "center", padding: "7rem" }}>
+              {errorInstance.message ? errorInstance.message : "Disconnected"}
+            </h5>
+            <p style={{ textAlign: "center" }}>
+              {errorInstance.subtitle?errorInstance.subtitle:""}
+            </p>
+          </div>
+        </Modal>
+      ) : null}
     </div>
   );
 }

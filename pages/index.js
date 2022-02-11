@@ -1,19 +1,16 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import MarketNfts from "../components/MarkerNfts";
-import dynamic from "next/dynamic";
-// import Modal from "../components/Modal";
+import Modal from "../components/Modal";
 import Intro from "../components/Intro";
 import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
-import { useState, useLayoutEffect, useEffect } from "react";
-import detectEthereumProvider from "@metamask/detect-provider";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const Modal = dynamic(() => import("../components/Modal"));
   const providerOptions = {
     connect: {
-      package: { mustBeMetaMask: true, silent: false, timeout: 100 },
+      package: { mustBeMetaMask: false, silent: false, timeout: 100 },
       options: {
         rpc: {
           137: "https://rpc-mumbai.matic.today",
@@ -23,7 +20,7 @@ export default function Home() {
     },
   };
 
-  const [connection, setConnection] = useState(null);
+  const [_connection, setConnection] = useState(null);
   const [errorInstance, setErrorInstance] = useState({
     status: false,
     message: "",
@@ -32,10 +29,10 @@ export default function Home() {
   async function connect() {
     try {
       const web3Model = new Web3Modal({
-        providerOptions, // required
+        providerOptions,
       });
-      const _connection = await web3Model.connect();
-      setConnection(_connection);
+      const _connect = await web3Model.connect();
+      setConnection(_connect);
       return connect;
     } catch (e) {
       setErrorInstance({ ...errorInstance, status: true, message: e.message });
@@ -45,13 +42,13 @@ export default function Home() {
   useEffect(async () => {
     await connect();
   }, [errorInstance.count]);
+
   return (
     <>
-      <Nav connection={connection} />
+      <Nav connection={_connection} />
       <Intro />
       <Spec />
-      <MarketNfts connection={connection} />
-      {errorInstance.status || connection == null ? (
+      {errorInstance.status | _connection  ? (
         <Modal>
           <div className="upload">
             <a
@@ -76,6 +73,7 @@ export default function Home() {
           </div>
         </Modal>
       ) : null}
+      <MarketNfts connection={_connection} />
       <Footer></Footer>
     </>
   );
