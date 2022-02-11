@@ -389,7 +389,7 @@ section:nth-child(n+2){
   order: 3;
   z-index: 2;
   animation: animate-fit 0.4s ease-in 1ms;
-  background: rgba(114, 2, 114, 0.1);
+  background: rgba(114, 2, 114, 0.2);
   height: 400px;
   width: 400px;
 }
@@ -397,13 +397,13 @@ section:nth-child(n+2){
   grid-column: 2/5;
   height: 80%;
   order: 2;
-  background: 4px solid rgba(114, 2, 114, 0.5);
+  background: rgba(114, 2, 114, 0.5);
 }
 .third {
   height: 60%;
   order: 1;
   grid-column: 3/6;
-  background: 4px solid rgba(114, 2, 114, 0.9);
+  background: rgba(114, 2, 114, 0.9);
 }
 .bgcolor_lit_purple {
   background-color: var(--color-bg2);
@@ -1101,7 +1101,9 @@ footer form input {
 .detail ~ div .price svg{
   transform: scale(0.8);
 }
-
+#WEB3_CONNECT_MODAL_ID{
+  display: none;
+}
 
 #modal>div {
   top:0;
@@ -1109,12 +1111,13 @@ footer form input {
 	bottom:0;
 	left:0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.8);
   overflow: hidden;
+  z-index: 5;
   position: fixed;
 }
 

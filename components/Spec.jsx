@@ -1,6 +1,6 @@
 export default function Spec(){
     return (
-    <div classNameName="bgcolor_lit_purple">
+    <div className="bgcolor_lit_purple">
       <section id="more-intro">
         <h3>THE AMAZING NET ART OF THE WORLD HERE</h3>
         <div>

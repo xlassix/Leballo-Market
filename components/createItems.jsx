@@ -45,7 +45,9 @@ export default function CreateNft() {
         name: "",
         description: "",
       })
-      setLoading(false)
+      setProgress(0)
+      setLoading(false);
+      setFileUrl(null);
   }
 
   async function fileHandler(e) {
@@ -75,7 +77,7 @@ export default function CreateNft() {
       const _added = await client.add(data);
       createSales(`https://ipfs.infura.io/ipfs/${_added.path}`);
     } catch (e) {
-      console.log(e.message);
+      console.log(e.message.__proto__);
     }
   }
 
@@ -157,9 +159,9 @@ export default function CreateNft() {
                     onSubmit={HandleSubmit}
                     disabled={
                       !(progress==1.0)
-                      & !(formData.description.length==0)
-                      & !(formData.price && /^\d+$/.test(formData.price))
-                      & !(formData.name.length!=0)
+                      || (formData.description.length==0)
+                      || !( /^\d+$/.test(formData.price))
+                      || (formData.name.length==0)
                     }
                   >
                     Create Nft

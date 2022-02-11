@@ -10,8 +10,8 @@ export default function Intro() {
   
   const [images, setImages] = useState([
     { id: 0, image: "./img/Asset 1.png" },
-    { id: 1, image: "./img/Asset 6.svg" },
-    { id: 2, image: "./img/Asset 5(1).svg" },
+    { id: 1, image: "./img/Asset 1.png" },
+    { id: 2, image: "./img/Asset 1.png" },
   ]);
   async function loadNfts() {
     const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.matic.today");
@@ -38,7 +38,6 @@ export default function Intro() {
     );
     console.log("items", items);
     setImages(items);
-    setLoaded(true);
   }
 
   useEffect(() => {
