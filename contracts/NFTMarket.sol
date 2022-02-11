@@ -180,7 +180,8 @@ contract NFTMarket is ReentrancyGuard {
 
     function getItemByTokenId(uint256 tokenId)
         internal
-        returns (uint)
+        view
+        returns (uint id)
     {
         uint256 itemCount = _itemsIds.current();
         for (uint256 index = 0; index < itemCount; index++) {
