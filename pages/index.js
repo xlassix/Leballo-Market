@@ -1,11 +1,14 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import MarketNfts from "../components/MarkerNfts";
-import Modal from "../components/Modal";
+// import Modal from "../components/Modal";
 import Intro from "../components/Intro";
 import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
+import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
+
+const Modal =dynamic(()=> import("../components/Modal"))
 
 export default function Home() {
   const providerOptions = {

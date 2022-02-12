@@ -147,6 +147,8 @@
   --color-green: #1aaa53;
   --font-style1: "Montserrat", sans-serif;
   --color-blank-img: #eeeeee;
+  --bg-background: #25252d;
+
 }
 
 /* border box model: https://css-tricks.com/box-sizing/ */
@@ -944,8 +946,114 @@ footer form input {
 }
 
 .bg-dark {
-  background-color: #25252d;
+  background-color:var(--bg-background);
   color: white;
+}
+section.flex {
+  --gap: 0;
+}
+
+.btn-grad {
+  background-image: linear-gradient(
+    to right,
+    var(--color-orange) -1%,
+    #ecaf3c 51%,
+    yellow 99%,
+    var(--color-orange) 100%
+  );
+}
+.btn-grad {
+  text-align: center;
+  text-transform: uppercase;
+  transition: all ease-in-out 0.45s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 2rem;
+}
+.btn-grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+  border-color: transparent;
+}
+.flex-50 {
+  flex-basis: 50%;
+}
+.btn-border {
+  background-color: transparent;
+  border: 0.2rem solid var(--color-orange);
+  text-align: center;
+  transition: 0.2s;
+  color: var(--color-orange);
+}
+
+.btn-border:hover {
+  background-color: transparent;
+  border: 0.2rem solid var(--color-orange);
+  transform: scaleX(1.05);
+}
+
+.rounded-button.btn-grad {
+  font-weight: 600;
+  font-size: 90%;
+  text-align: center;
+}
+
+section.flex > img,
+section.flex > div {
+  padding: 4rem;
+  margin: 0;
+  border: 2px solid var(--color-light-btn3);
+  border-top: none;
+}
+section.flex > :first-child {
+  border-left: none;
+  flex-basis: 55%;
+}
+section.flex > :last-child {
+  border-right: none;
+  flex-basis: 45%;
+}
+
+.nft-detail .rounded-button {
+  padding: 0.6rem 2rem;
+}
+
+.nft-detail .rounded-button {
+  padding: 0.6rem 2rem;
+}
+.nft-detail .title{
+  max-width: 300px;
+}
+.nft-detail{
+  display: flex;
+  flex-direction: column;
+}
+.nft-detail .title>:first-child,.nft-detail{
+  justify-content: space-between;
+}
+.nft-detail .title h5 {
+  font-weight: 600;
+  font-size: 125%;
+  margin :0;
+}
+.nft-detail .title >div{
+  margin-bottom: 1rem;
+}
+.nft-detail .title p{
+  margin: 0;
+}
+
+ul.flex{
+  list-style-type: none;
+  padding:0;
+}
+
+ul.flex>li{
+  padding: 0.2rem 1rem;
+}
+ul.flex>li:first-child{
+  border-bottom: 3px solid var(--color-light-btn4);
 }
 
 .profile-pic {
@@ -1075,9 +1183,19 @@ footer form input {
 }
 .bg-dark > section:nth-child(n + 2) {
   max-width: 900px;
+  color: var(--color-light-btn4);
+}
+.bg-dark>.flex{
+  padding-top: 2rem;
+}
+.bg-dark > section:last-child input {
+  background-color: var(--bg-background);
+  color: var(--color-light-btn4);
 }
 .bg-dark > section:last-child {
-  max-width: 1200px;
+  max-width: var(--max-width);
+  color: var(--color-light-btn4);
+  margin-bottom: 0;
 }
 .mobile-nav-icon {
   display: none;
