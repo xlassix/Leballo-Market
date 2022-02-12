@@ -1,137 +1,167 @@
 /* cyrillic-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw0aXpsog.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw0aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
+    U+FE2E-FE2F;
 }
 /* cyrillic */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw9aXpsog.woff2) format('woff2');
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw9aXpsog.woff2)
+    format("woff2");
   unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 /* vietnamese */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw2aXpsog.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw2aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1,
+    U+01AF-01B0, U+1EA0-1EF9, U+20AB;
 }
 /* latin-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw3aXpsog.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw3aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXo.woff2)
+    format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
 }
 /* cyrillic-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w0aXpsog.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w0aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
+    U+FE2E-FE2F;
 }
 /* cyrillic */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w9aXpsog.woff2) format('woff2');
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w9aXpsog.woff2)
+    format("woff2");
   unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 /* vietnamese */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w2aXpsog.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w2aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1,
+    U+01AF-01B0, U+1EA0-1EF9, U+20AB;
 }
 /* latin-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w3aXpsog.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w3aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w5aXo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w5aXo.woff2)
+    format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
 }
 /* cyrillic-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w0aXpsog.woff2) format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w0aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F,
+    U+FE2E-FE2F;
 }
 /* cyrillic */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w9aXpsog.woff2) format('woff2');
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w9aXpsog.woff2)
+    format("woff2");
   unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 /* vietnamese */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w2aXpsog.woff2) format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w2aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1,
+    U+01AF-01B0, U+1EA0-1EF9, U+20AB;
 }
 /* latin-ext */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w3aXpsog.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w3aXpsog.woff2)
+    format("woff2");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 /* latin */
 @font-face {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w5aXo.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url(https://fonts.gstatic.com/s/montserrat/v21/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w5aXo.woff2)
+    format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
 }
 
 :root {
@@ -148,7 +178,6 @@
   --font-style1: "Montserrat", sans-serif;
   --color-blank-img: #eeeeee;
   --bg-background: #25252d;
-
 }
 
 /* border box model: https://css-tricks.com/box-sizing/ */
@@ -268,7 +297,7 @@ footer {
   max-width: var(--max-width);
   margin: 0rem auto;
 }
-section:nth-child(n+2){
+section:nth-child(n + 2) {
   margin: 2rem auto;
 }
 
@@ -335,18 +364,18 @@ section:nth-child(n+2){
   border-radius: 1rem;
 }
 
-.range_slider::-webkit-slider-thumb{
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: 1rem;
-    padding: 0.2rem 0.75rem;
-    height: 0.2rem;
-    width: 2rem;
-    margin: 0.1rem; 
-    background: var(--color-light-btn2);
-    cursor: pointer;
-    border: none;
-} 
+.range_slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 1rem;
+  padding: 0.2rem 0.75rem;
+  height: 0.2rem;
+  width: 2rem;
+  margin: 0.1rem;
+  background: var(--color-light-btn2);
+  cursor: pointer;
+  border: none;
+}
 .range_slider::-moz-range-thumb {
   background-color: var(--color-light-btn2);
   border-radius: 1rem;
@@ -380,10 +409,10 @@ section:nth-child(n+2){
   grid-row: 1/2;
   position: relative;
 }
-.img-slider .second{
+.img-slider .second {
   z-index: 0;
 }
-.img-slider .second{
+.img-slider .second {
   z-index: 1;
 }
 .first {
@@ -717,7 +746,7 @@ figcaption {
   margin-bottom: 0;
   font-weight: 400;
 }
-.flex-sb{
+.flex-sb {
   justify-content: space-between;
 }
 
@@ -941,12 +970,12 @@ footer form input {
   outline: none;
   background: transparent;
 }
-.bg-dark footer form input{
+.bg-dark footer form input {
   color: white;
 }
 
 .bg-dark {
-  background-color:var(--bg-background);
+  background-color: var(--bg-background);
   color: white;
 }
 section.flex {
@@ -958,8 +987,7 @@ section.flex {
     to right,
     var(--color-orange) -1%,
     #ecaf3c 51%,
-    yellow 99%,
-    var(--color-orange) 100%
+    yellow 100%
   );
 }
 .btn-grad {
@@ -1022,37 +1050,38 @@ section.flex > :last-child {
 .nft-detail .rounded-button {
   padding: 0.6rem 2rem;
 }
-.nft-detail .title{
+.nft-detail .title {
   max-width: 300px;
 }
-.nft-detail{
+.nft-detail {
   display: flex;
   flex-direction: column;
 }
-.nft-detail .title>:first-child,.nft-detail{
+.nft-detail .title > :first-child,
+.nft-detail {
   justify-content: space-between;
 }
 .nft-detail .title h5 {
   font-weight: 600;
   font-size: 125%;
-  margin :0;
+  margin: 0;
 }
-.nft-detail .title >div{
+.nft-detail .title > div {
   margin-bottom: 1rem;
 }
-.nft-detail .title p{
+.nft-detail .title p {
   margin: 0;
 }
 
-ul.flex{
+ul.flex {
   list-style-type: none;
-  padding:0;
+  padding: 0;
 }
 
-ul.flex>li{
+ul.flex > li {
   padding: 0.2rem 1rem;
 }
-ul.flex>li:first-child{
+ul.flex > li:first-child {
   border-bottom: 3px solid var(--color-light-btn4);
 }
 
@@ -1185,7 +1214,7 @@ ul.flex>li:first-child{
   max-width: 900px;
   color: var(--color-light-btn4);
 }
-.bg-dark>.flex{
+.bg-dark > .flex {
   padding-top: 2rem;
 }
 .bg-dark > section:last-child input {
@@ -1200,7 +1229,7 @@ ul.flex>li:first-child{
 .mobile-nav-icon {
   display: none;
 }
-#featured svg{
+#featured svg {
   transform: scale(0.75);
 }
 
@@ -1216,18 +1245,18 @@ ul.flex>li:first-child{
 .mobile-nav li {
   position: relative;
 }
-.detail ~ div .price svg{
+.detail ~ div .price svg {
   transform: scale(0.8);
 }
-#WEB3_CONNECT_MODAL_ID{
+#WEB3_CONNECT_MODAL_ID {
   display: none;
 }
 
-#modal>div {
-  top:0;
-	right:0;
-	bottom:0;
-	left:0;
+#modal > div {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
@@ -1239,42 +1268,42 @@ ul.flex>li:first-child{
   position: fixed;
 }
 
-.modal-content{
+.modal-content {
   --bg-color: white;
-  --radius : 0.25rem;
+  --radius: 0.25rem;
   position: relative;
-  background-color: var(--bg-color,white);
-  border-radius: var(--radius,0.4rem);
+  background-color: var(--bg-color, white);
+  border-radius: var(--radius, 0.4rem);
   max-width: 450px;
   animation-name: animatetop;
   animation-duration: 0.4s;
   animation-delay: 1ms;
 }
 
-.upload{
+.upload {
   display: flex;
   flex-direction: column;
   margin-bottom: 2rem;
 }
-.upload>*{
+.upload > * {
   min-width: calc(100% - 2rem);
   margin: 0.5rem 1rem;
 }
-.upload>a{
+.upload > a {
   display: block;
   margin-bottom: 2rem;
 }
-.rounded-button:disabled{
+.rounded-button:disabled {
   --text-color: var(--color-light-btn2);
-  --body-color: var( --color-dark-text);
-  --border-color: none
+  --body-color: var(--color-dark-text);
+  --border-color: none;
 }
-.rounded-button:disabled:hover{
+.rounded-button:disabled:hover {
   --body-color: var(--color-light-btn2);
-  --text-color:var( --color-dark-text); 
-  --border-color: none
+  --text-color: var(--color-dark-text);
+  --border-color: none;
 }
-  @media (max-width: 950px) {
+@media (max-width: 950px) {
   #top-collection {
     flex-basis: 100%;
   }
@@ -1316,7 +1345,8 @@ ul.flex>li:first-child{
     transform: rotate(90deg);
   }
   #nfts,
-  footer,#my-nfts {
+  footer,
+  #my-nfts {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
@@ -1332,7 +1362,8 @@ ul.flex>li:first-child{
   #nfts figure {
     margin: 1rem;
   }
-  section,#__next>nav {
+  section,
+  #__next > nav {
     margin: 0 1.4rem;
   }
 }
@@ -1445,6 +1476,12 @@ ul.flex>li:first-child{
 
 /* Add Animation */
 @keyframes animatetop {
-  from {top: -100px; opacity: 0.6}
-  to {top: 0; opacity: 1}
+  from {
+    top: -100px;
+    opacity: 0.6;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
 }
