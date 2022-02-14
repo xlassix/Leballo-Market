@@ -42,6 +42,7 @@ contract MusicMarket is ReentrancyGuard {
         uint256 price;
         uint albumId;
         uint trackNumber;
+        uint artistId;
         SongStatus status;
     }
     struct Artist {
@@ -73,6 +74,7 @@ contract MusicMarket is ReentrancyGuard {
         uint256 price,
         uint indexed albumId,
         uint trackNumber,
+        uint artistId,
         SongStatus status,
         string message
     );
@@ -187,6 +189,7 @@ contract MusicMarket is ReentrancyGuard {
         address musicContract,
         uint256 tokenId,
         uint256 albumId,
+        uint256 artistId,
         uint256 price
     ) public payable nonReentrant {
         require(price > 0, "Item Price most be greater then 1 WEI");
@@ -205,6 +208,7 @@ contract MusicMarket is ReentrancyGuard {
             payable(msg.sender),
             price,
             albumId,
+            artistId,
             _album.mintedSongs+1,
             SongStatus.Active
         );
@@ -218,6 +222,7 @@ contract MusicMarket is ReentrancyGuard {
             msg.sender,
             price,
             albumId,
+            artistId,
             _album.mintedSongs,
             SongStatus.Active,
             "Created MusicNFT"
@@ -252,6 +257,7 @@ contract MusicMarket is ReentrancyGuard {
             item.owner,
             item.price,
             item.albumId,
+            item.artistId,
             item.trackNumber,
             SongStatus.Sold,
             "Sold MusicNFT"
@@ -286,6 +292,7 @@ contract MusicMarket is ReentrancyGuard {
             price,
             itemIdToSong[itemId].albumId,
             itemIdToSong[itemId].trackNumber,
+            itemIdToSong[itemId].artistId,
             SongStatus.Sold,
             "Transferred MusicNFT"
         );
@@ -320,6 +327,7 @@ contract MusicMarket is ReentrancyGuard {
             price,
             currentToken.albumId,
             currentToken.trackNumber,
+            currentToken.artistId,
             SongStatus.Active,
             "List MusicNFT"
         );
@@ -350,6 +358,7 @@ contract MusicMarket is ReentrancyGuard {
             currentToken.price,
             currentToken.albumId,
             currentToken.trackNumber,
+            currentToken.artistId,
             SongStatus.Active,
             "List MusicNFT"
         );
