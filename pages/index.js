@@ -1,16 +1,16 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import MarketNfts from "../components/MarkerNfts";
-// import Modal from "../components/Modal";
 import Intro from "../components/Intro";
 import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
 import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
+import { Context } from "../components/Context";
+import { useState, useEffect,useContext } from "react";
 
-const Modal =dynamic(()=> import("../components/Modal"))
 
 export default function Home() {
+  const Modal =dynamic(()=> import("../components/Modal"))
   const providerOptions = {
     connect: {
       package: { mustBeMetaMask: false, silent: false, timeout: 100 },
@@ -23,35 +23,31 @@ export default function Home() {
     },
   };
 
-  const [_connection, setConnection] = useState(null);
-  const [errorInstance, setErrorInstance] = useState({
-    status: false,
-    message: "",
-    count: 0,
-  });
+  const { address, errorInstance, setErrorInstance, setAddress } =
+  useContext(Context).state;
+
   async function connect() {
     try {
       const web3Model = new Web3Modal({
         providerOptions,
       });
-      const _connect = await web3Model.connect();
-      setConnection(_connect);
-      return connect;
+      const connection = await web3Model.connect();
+      await setAddress(connection.selectedAddress);
     } catch (e) {
       setErrorInstance({ ...errorInstance, status: true, message: e.message });
     }
   }
 
-  useEffect(async () => {
+  useEffect(async() => {
     await connect();
   }, [errorInstance.count]);
 
   return (
     <>
-      <Nav connection={_connection} />
+      <Nav  />
       <Intro />
       <Spec />
-      {errorInstance.status | _connection  ? (
+      {errorInstance.status | !address  ? (
         <Modal>
           <div className="upload">
             <a
@@ -70,13 +66,13 @@ export default function Home() {
               {errorInstance.message?errorInstance.message:"Disconnected"}
             </h5>
             <p style={{ textAlign: "center" }}>
-              kindly Install Metabase and Verify you on the Polygon
+              kindly Install MetaMask and Verify you on the Polygon
               Network(TestNet)
             </p>
           </div>
         </Modal>
       ) : null}
-      <MarketNfts connection={_connection} />
+      <MarketNfts />
       <Footer></Footer>
     </>
   );

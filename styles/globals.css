@@ -1036,7 +1036,7 @@ section.flex > div {
 }
 section.flex > :first-child {
   border-left: none;
-  flex-basis: 55%;
+  width: 55%;
 }
 section.flex > :last-child {
   border-right: none;

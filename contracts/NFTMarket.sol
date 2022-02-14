@@ -1,6 +1,5 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
-
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -12,7 +11,7 @@ contract NFTMarket is ReentrancyGuard {
     Counters.Counter private _nftMarketCount;
     Counters.Counter private _currentListings;
     address payable _owner;
-    uint256 listingPrice = 0.025 ether;
+    uint256 private listingPrice = 0.025 ether;
 
     enum MarketItemStatus {
         Active,
@@ -28,7 +27,7 @@ contract NFTMarket is ReentrancyGuard {
         uint256 price;
         MarketItemStatus status;
     }
-    mapping(uint256 => MarketItem) private itemIdToMarketItem;
+    mapping(uint256 => MarketItem) public itemIdToMarketItem;
 
     event MarketItemEvent(
         uint256 indexed itemId,
@@ -46,6 +45,11 @@ contract NFTMarket is ReentrancyGuard {
     }
 
     function getListingPrice() public view returns (uint256) {
+        return listingPrice;
+    }
+    function setListingPrice(uint256 price) external returns (uint256) {
+        require(_owner==msg.sender,"Only the Owner Can set Listing Price");
+        listingPrice = price;
         return listingPrice;
     }
 
@@ -89,7 +93,7 @@ contract NFTMarket is ReentrancyGuard {
         nonReentrant
         returns (MarketItem memory)
     {
-        MarketItem memory item = itemIdToMarketItem[getItemByTokenId(tokenId)];
+        MarketItem memory item = getItemByTokenId(tokenId);
         require(
             item.status == MarketItemStatus.Active,
             "Items That aint Listed cant be Solded"
@@ -179,14 +183,14 @@ contract NFTMarket is ReentrancyGuard {
     }
 
     function getItemByTokenId(uint256 tokenId)
-        internal
+        public
         view
-        returns (uint id)
+        returns (MarketItem memory item)
     {
         uint256 itemCount = _itemsIds.current();
         for (uint256 index = 0; index < itemCount; index++) {
             if (itemIdToMarketItem[index + 1].tokenId == tokenId) {
-                return itemIdToMarketItem[index + 1].itemId;
+                return itemIdToMarketItem[index + 1];
             }
         }
         require(false, "Invalid Token ID");

@@ -1,6 +1,6 @@
-export default function MarketNftCard({nft,onPurchase}){
+export default function MarketNftCard({nft,onPurchase,onclick}){
     return(
-        <figure>
+        <figure onClick={onclick}>
         <img src={nft.image} />
         <div className="avatars">
           <img src="/img/Avatar.png" />

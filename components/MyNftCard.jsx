@@ -1,6 +1,7 @@
 import Modal from "./Modal";
-import { useState } from "react";
+import { useState,useContext } from "react";
 export default function MyNftCard({ nft, listFunc }) {
+
   const [showModal, setModal] = useState(false);
   const [sellingPrice, setSellingPrice] = useState();
   const [loading, setLoading] = useState(true);

@@ -1,7 +1,6 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-import Detail from "../components/details"
-import "../styles/upload.module.css";
+import Detail from "../components/Details"
 
 export default function AccountPage() {
   return (

@@ -1,26 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Modal from "./Modal";
 import { ethers } from "ethers";
 import axios from "axios";
 import Web3Modal from "web3modal";
 import MarketNftCard from "./MarketNftCard";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
-import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
+import { Context } from "./Context";
+import { useRouter } from "next/router";
 
 export default function MarketNfts() {
+  const {
+    nftAddress,
+    Market,
+    NFT,
+    nftMarketPlaceAddress,
+    errorInstance,
+    setErrorInstance,
+    setCurrentNft,
+  } = useContext(Context).state;
+
+  const router = useRouter();
+
   const nftPerPage = 20;
   const [showModal, setModal] = useState();
   const [page, setPage] = useState(1);
   function toggleData() {
     setModal(!showModal);
   }
-  const [errorInstance, setErrorInstance] = useState({
-    status: false,
-    message: "",
-    subtitle: "",
-    count: 0,
-  });
+
   const [nfts, setNfts] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -87,8 +93,13 @@ export default function MarketNfts() {
 
       await transaction.wait();
     } catch (e) {
-      console.log(e.message)
-      setErrorInstance({ ...errorInstance, status: true, message: e.message,subtitle : e.data.message });
+      console.log(e.message);
+      setErrorInstance({
+        ...errorInstance,
+        status: true,
+        message: e.message,
+        subtitle: e.data.message,
+      });
     }
     loadNfts();
   }
@@ -133,6 +144,10 @@ export default function MarketNfts() {
             {nfts.map((nft, i) => {
               return (
                 <MarketNftCard
+                  onclick={() => {
+                    setCurrentNft(nft),
+                    router.push("/detail");
+                  }}
                   nft={nft}
                   key={i}
                   onPurchase={() => buyNfts(nft)}
@@ -142,7 +157,7 @@ export default function MarketNfts() {
           </div>
         )}
       </section>
-      {errorInstance.status? (
+      {errorInstance.status ? (
         <Modal>
           <div className="upload">
             <a
@@ -161,7 +176,7 @@ export default function MarketNfts() {
               {errorInstance.message ? errorInstance.message : "Disconnected"}
             </h5>
             <p style={{ textAlign: "center" }}>
-              {errorInstance.subtitle?errorInstance.subtitle:""}
+              {errorInstance.subtitle ? errorInstance.subtitle : ""}
             </p>
           </div>
         </Modal>
