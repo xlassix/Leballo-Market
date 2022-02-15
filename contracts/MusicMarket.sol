@@ -40,9 +40,9 @@ contract MusicMarket is ReentrancyGuard {
         address payable owner;
         address payable seller;
         uint256 price;
-        uint albumId;
-        uint trackNumber;
-        uint artistId;
+        uint256 albumId;
+        uint256 trackNumber;
+        uint256 artistId;
         SongStatus status;
     }
     struct Artist {
@@ -55,15 +55,16 @@ contract MusicMarket is ReentrancyGuard {
         uint256 createdAt;
         AlbumStatus Status;
         string coverUrl;
-        uint mintedSongs;
-        uint soldSongs;
+        uint256 mintedSongs;
+        uint256 soldSongs;
     }
 
     //Mapping Definition
     mapping(uint256 => Song) public itemIdToSong;
-    mapping(uint256 => Artist) public Artists;
-    mapping(uint256 => Album) public Albums;
-    mapping(uint256 => uint[]) public AlbumToArtistMapping;
+    mapping(uint256 => Artist) public artists;
+    mapping(uint256 => Album) private _albums;
+    mapping(uint256 => uint256[]) private _albumToArtistMapping;
+    mapping(address => uint256) private ownerToNftCount;
 
     event SongEvent(
         uint256 indexed itemId,
@@ -72,9 +73,9 @@ contract MusicMarket is ReentrancyGuard {
         address owner,
         address seller,
         uint256 price,
-        uint indexed albumId,
-        uint trackNumber,
-        uint artistId,
+        uint256 indexed albumId,
+        uint256 trackNumber,
+        uint256 artistId,
         SongStatus status,
         string message
     );
@@ -85,8 +86,8 @@ contract MusicMarket is ReentrancyGuard {
         uint256 createdAt,
         AlbumStatus Status,
         string coverUrl,
-        uint mintedSongs,
-        uint soldSongs,
+        uint256 mintedSongs,
+        uint256 soldSongs,
         string message
     );
 
@@ -141,7 +142,7 @@ contract MusicMarket is ReentrancyGuard {
         require(bytes(uri).length != 0, "URI cant be null or empty");
         _artistCount.increment();
         uint256 currentArtistId = _artistCount.current();
-        Artists[currentArtistId] = Artist(
+        artists[currentArtistId] = Artist(
             artistName,
             ArtistStatus.NotVerified,
             uri
@@ -156,15 +157,68 @@ contract MusicMarket is ReentrancyGuard {
         return currentArtistId;
     }
 
-    function createAlbum(string memory albumName, string memory uri)
+    function setArtistAvatar(uint256 artistId, string memory uri)
         external
         onlyOwner
-        returns (uint256 albumId)
+        returns (uint256 artistID)
     {
         require(bytes(uri).length != 0, "URI cant be null or empty");
+        require(
+            artistId <= _artistCount.current(),
+            "URI cant be null or empty"
+        );
+        Artist storage _artist = artists[artistId];
+        _artist.url = uri;
+        emit ArtistEvent(
+            artistId,
+            _artist.artistName,
+            _artist.Status,
+            _artist.url,
+            "Artist Avatar set"
+        );
+        return artistId;
+    }
+
+    function getMax(uint256[] memory array) public pure returns (uint256) {
+        uint256 largest = 0;
+        uint256 i;
+
+        for (i = 0; i < array.length; i++) {
+            if (array[i] > largest) {
+                largest = array[i];
+            }
+        }
+        return largest;
+    }
+
+    function checkIfExist(uint256[] memory array, uint256 value)
+        public
+        pure
+        returns (bool)
+    {
+        for (uint256 i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function createAlbum(
+        string memory albumName,
+        string memory uri,
+        uint256[] memory _artists
+    ) external onlyOwner returns (uint256 albumId) {
+        require(bytes(uri).length != 0, "URI cant be null or empty");
+        require(_artists.length != 0, "At least include a length");
+        require(
+            getMax(_artists) <= _artistCount.current(),
+            "The array artists contains an Invalid Id"
+        );
+
         _albumCount.increment();
         uint256 currentAlbumId = _albumCount.current();
-        Albums[currentAlbumId] = Album(
+        _albums[currentAlbumId] = Album(
             albumName,
             block.timestamp,
             AlbumStatus.Reserved,
@@ -172,6 +226,7 @@ contract MusicMarket is ReentrancyGuard {
             0,
             0
         );
+        _albumToArtistMapping[currentAlbumId] = _artists;
         emit AlbumEvent(
             currentAlbumId,
             albumName,
@@ -194,12 +249,14 @@ contract MusicMarket is ReentrancyGuard {
     ) public payable nonReentrant {
         require(price > 0, "Item Price most be greater then 1 WEI");
         require(msg.value >= listingPrice, "Insufficent listing fee");
-        require(tokenId >= _songCount.current(), "invalid Token");
-        require(albumId >= _albumCount.current(), "invalid Token");
+        require(tokenId >= _songCount.current(), "invalid TokenId");
+        require(albumId >= _albumCount.current(), "Invalid AlbumId");
+        require(checkIfExist(_albumToArtistMapping[albumId],artistId), "This Artist is Not on the Album");
+
 
         _songCount.increment();
         uint256 currentItemId = _songCount.current();
-        Album storage _album = Albums[albumId];
+        Album storage _album = _albums[albumId];
         itemIdToSong[currentItemId] = Song(
             currentItemId,
             tokenId,
@@ -208,11 +265,11 @@ contract MusicMarket is ReentrancyGuard {
             payable(msg.sender),
             price,
             albumId,
+            _album.mintedSongs + 1,
             artistId,
-            _album.mintedSongs+1,
             SongStatus.Active
         );
-        _album.mintedSongs+=1;
+        _album.mintedSongs += 1;
         IERC721(musicContract).transferFrom(msg.sender, address(this), tokenId);
         emit SongEvent(
             currentItemId,
@@ -243,6 +300,8 @@ contract MusicMarket is ReentrancyGuard {
         require(msg.value >= item.price, "Insufficent funds");
 
         IERC721(musicContract).transferFrom(item.owner, msg.sender, tokenId);
+        ownerToNftCount[item.owner]--;
+        ownerToNftCount[msg.sender]++;
         _currentListings.decrement();
         item.owner.transfer(item.price);
         item.status = SongStatus.Sold;
@@ -277,6 +336,7 @@ contract MusicMarket is ReentrancyGuard {
         require(msg.value >= price, "kindly transfer the listed price");
 
         IERC721(musicContract).transferFrom(address(this), msg.sender, tokenId);
+        ownerToNftCount[msg.sender]++;
         currentToken.status = SongStatus.Sold;
         currentToken.owner = payable(msg.sender);
         _musicMarketCount.increment();
@@ -333,10 +393,7 @@ contract MusicMarket is ReentrancyGuard {
         );
     }
 
-    function CancelItem(
-        address musicContract,
-        uint256 itemId
-    ) public payable {
+    function CancelItem(address musicContract, uint256 itemId) public payable {
         Song storage currentToken = itemIdToSong[itemId];
         uint256 tokenId = currentToken.tokenId;
         require(
@@ -376,6 +433,15 @@ contract MusicMarket is ReentrancyGuard {
             }
         }
         require(false, "Invalid Token ID");
+    }
+
+    function getAlbum(uint256 albumId)
+        external
+        view
+        returns (Album memory _album, uint256[] memory _artists)
+    {
+        require(_albumCount.current() >= albumId, "Invalid Token ID");
+        return (_albums[albumId], _albumToArtistMapping[albumId]);
     }
 
     function getLastMinted(uint256 limit) public view returns (Song[] memory) {
@@ -430,16 +496,8 @@ contract MusicMarket is ReentrancyGuard {
         returns (Song[] memory)
     {
         uint256 _itemsCount = _songCount.current();
-        uint256 musicOwned = 0;
+        uint256 musicOwned = ownerToNftCount[msg.sender];
         uint256 currentIndexOfMusicNFTFound = 0;
-
-        for (uint256 index = 0; index < _itemsCount; index++) {
-            if (
-                itemIdToSong[index + 1].owner == msg.sender
-            ) {
-                musicOwned += 1;
-            }
-        }
         if (musicOwned == 0) {
             return new Song[](0);
         }
@@ -449,42 +507,7 @@ contract MusicMarket is ReentrancyGuard {
             if (currentIndexOfMusicNFTFound == _min) {
                 break;
             }
-            if (
-                itemIdToSong[index + 1].owner == msg.sender
-            ) {
-                myMusicNFTs[currentIndexOfMusicNFTFound] = itemIdToSong[
-                    index + 1
-                ];
-                currentIndexOfMusicNFTFound += 1;
-            }
-        }
-        return myMusicNFTs;
-    }
-
-    function fetchMusicNFTsCreated(uint256 limit)
-        public
-        view
-        returns (Song[] memory)
-    {
-        uint256 _itemsCount = _songCount.current();
-        uint256 musicCreated = 0;
-        uint256 currentIndexOfMusicNFTFound = 0;
-
-        for (uint256 index = 0; index < _itemsCount; index++) {
-            if (itemIdToSong[index + 1].seller == msg.sender) {
-                musicCreated += 1;
-            }
-        }
-        if (musicCreated == 0) {
-            return new Song[](0);
-        }
-        uint256 _min = Math.min(limit, musicCreated);
-        Song[] memory myMusicNFTs = new Song[](_min);
-        for (uint256 index = 0; index < _itemsCount; index++) {
-            if (currentIndexOfMusicNFTFound == _min) {
-                break;
-            }
-            if (itemIdToSong[index + 1].seller == msg.sender) {
+            if (itemIdToSong[index + 1].owner == msg.sender) {
                 myMusicNFTs[currentIndexOfMusicNFTFound] = itemIdToSong[
                     index + 1
                 ];

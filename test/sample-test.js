@@ -28,6 +28,7 @@ describe("Nft market", async function () {
     let tokenId2 = tx2.events[0].args[2].toNumber();
     // console.debug(tx2.events[0]['transactionHash'])
     const auction_price = ethers.utils.parseUnits("100", "ether");
+    
 
     await market.createMarketItem(nftMarketAddress, tokenId1, auction_price, {
       value: listingPrice,
@@ -60,22 +61,22 @@ describe("Nft market", async function () {
       .createMarketItemSale(nftMarketAddress, 1, { value: auction_price });
 
     // console.debug("data",market)
-    console.debug(
-      await Promise.all(
-        (
-          await market.getMarketItems(20)
-        ).map(async (i) => {
-          const tokenURI = await nft.tokenURI(i.tokenId);
-          return {
-            tokenURI,
-            price: i.price.toString(),
-            tokenId: i.tokenId.toString(),
-            seller: i.seller,
-            owner: i.owner,
-          };
-        })
-      )
-    );
+    // console.debug(
+    //   await Promise.all(
+    //     (
+    //       await market.getMarketItems(20)
+    //     ).map(async (i) => {
+    //       const tokenURI = await nft.tokenURI(i.tokenId);
+    //       return {
+    //         tokenURI,
+    //         price: i.price.toString(),
+    //         tokenId: i.tokenId.toString(),
+    //         seller: i.seller,
+    //         owner: i.owner,
+    //       };
+    //     })
+    //   )
+    // );
   });
   it("Should create and execute and list sales", async function () {
     const _market = await ethers.getContractFactory("NFTMarket");
@@ -102,7 +103,6 @@ describe("Nft market", async function () {
 
     let tokenId1 = tx1.events[0].args[2].toNumber();
     let tokenId2 = tx2.events[0].args[2].toNumber();
-    console.debug(tx2.events[0]["transactionHash"]);
     const auction_price = ethers.utils.parseUnits("100", "ether");
 
     await market.createMarketItem(nftMarketAddress, tokenId1, auction_price, {
@@ -132,20 +132,15 @@ describe("Nft market", async function () {
 
     const [sellerAddress, buyerAddress] = await ethers.getSigners();
 
-    console.debug({ buyer: buyerAddress.address });
     let data = await market
       .connect(buyerAddress)
       .createMarketItemSale(nftMarketAddress, 1, { value: auction_price });
 
     data = await data.wait();
 
-    console.debug({ data: data });
-
     let test_func = async (i) => {
-      console.debug(i.events[2]);
       let result = i.events[2].args;
       const tokenURI = await nft.tokenURI(result.tokenId.toString());
-      console.debug({ dataz: tokenURI });
       return {
         tokenURI,
         contract: result.nftContract,
@@ -156,13 +151,9 @@ describe("Nft market", async function () {
       };
     };
     let datax = await test_func(data);
-    console.debug({ datax, buyer: buyerAddress.address, kk: datax.contract });
-
-    console.debug({ nftMarketAddress, dddd: datax.tokenId });
     let dataxx = await nft.ownerOf(datax.tokenId);
     // dataxx = await dataxx.wait()
 
-    console.debug({ knjkjb: dataxx, owner: buyerAddress.address == dataxx });
 
     // let xx= await nft.requestTransfer(buyerAddress.address,marketplaceAddress, datax.tokenId,{from:(buyerAddress.address).toString()});
     // let _mine=await xx.wait()
@@ -180,32 +171,28 @@ describe("Nft market", async function () {
         value: listingPrice,
       });
     tx = await data.wait();
-    console.log({ data });
     data = await market
       .connect(sellerAddress)
       .BuyMarketItem(nftMarketAddress, datax.tokenId,{value:auction_price});
 
     tx = await data.wait();
-    console.log({"da": data });
 
-    console.debug(sellerAddress.address)
-
-    console.debug(
-      await Promise.all(
-        (
-          await market.connect(sellerAddress).fetchMyNfts(20)
-        ).map(async (i) => {
-          const tokenURI = await nft.tokenURI(i.tokenId);
-          return {
-            tokenURI,
-            price: i.price.toString(),
-            tokenId: i.tokenId.toString(),
-            seller: i.seller,
-            owner: i.owner,
-          };
-        })
-      )
-    );
+    // console.debug(
+    //   await Promise.all(
+    //     (
+    //       await market.connect(sellerAddress).fetchMyNfts(20)
+    //     ).map(async (i) => {
+    //       const tokenURI = await nft.tokenURI(i.tokenId);
+    //       return {
+    //         tokenURI,
+    //         price: i.price.toString(),
+    //         tokenId: i.tokenId.toString(),
+    //         seller: i.seller,
+    //         owner: i.owner,
+    //       };
+    //     })
+    //   )
+    // );
   });
 
   it("listed Items should be visible in the marketPlace", async function () {
@@ -237,7 +224,6 @@ describe("Nft market", async function () {
 
     let tokenId1 = tx1.events[0].args[2].toNumber();
     let tokenId2 = tx2.events[0].args[2].toNumber();
-    console.debug(tx2.events[0]["transactionHash"]);
     const auction_price = ethers.utils.parseUnits("100", "ether");
 
     await market.createMarketItem(nftMarketAddress, tokenId1, auction_price, {
@@ -267,14 +253,12 @@ describe("Nft market", async function () {
 
     const [sellerAddress, buyerAddress] = await ethers.getSigners();
 
-    console.debug({ buyer: buyerAddress.address });
     let data = await market
       .connect(buyerAddress)
       .createMarketItemSale(nftMarketAddress, 1, { value: auction_price });
 
     data = await data.wait();
 
-    console.debug({ data: data });
 
     data = await market
       .connect(buyerAddress)
@@ -288,11 +272,9 @@ describe("Nft market", async function () {
     //   .getMarketItems(20);
 
     tx = await data.wait();
-    console.log({"da": data });
 
-    console.debug(sellerAddress.address)
+    // console.debug(sellerAddress.address)
     
-    console.debug(
       await Promise.all(
         (
           await market.connect(sellerAddress).getMarketItems(20)
@@ -307,10 +289,7 @@ describe("Nft market", async function () {
           };
         })
       )
-    );
 
-
-    console.debug(
       await Promise.all(
         (
           await market.connect(sellerAddress).getLastMinted(20)
@@ -325,6 +304,5 @@ describe("Nft market", async function () {
           };
         })
       )
-    );
   });
 });
