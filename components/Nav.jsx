@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Link from "next/link";
-import CreateNft from "./createItems";
+import CreateNft from "./CreateItems";
+import { useRouter } from "next/router";
+import { Context } from "./Context";
+import Web3Modal from "web3modal";
 
-function Nav({ isAdmin,connection }) {
-  console.log(isAdmin,connection);
+function Nav({ isAdmin}) {
+  const { address, errorInstance, setErrorInstance, setAddress } =
+    useContext(Context).state;
   const [mobileNavIconVisibility, setMobileNavIconVisibility] = useState(false);
   const [mobileNavVisibility, setMobileNavVisibility] = useState(false);
   function toggleNavVisiblity() {
     setMobileNavIconVisibility(!mobileNavIconVisibility);
     setMobileNavVisibility(!mobileNavVisibility);
+  }
+
+  async function connect() {
+    try {
+      const _web3 = new Web3Modal();
+      const connection = await _web3.connect();
+      await setAddress(connection.selectedAddress);
+      var d = document.getElementById("WEB3_CONNECT_MODAL_ID");
+      d.remove()
+    } catch (e) {
+      setErrorInstance({ ...errorInstance, status: true, message: e.message });
+    }
   }
   return (
     <>
@@ -42,16 +58,20 @@ function Nav({ isAdmin,connection }) {
             </form>
           </li>
           <li>
-          {isAdmin===true ? (
-            <CreateNft />
-          ) : (
-            <Link href="/account">
-              <a className="rounded-button">My Account</a>
-            </Link>
-          )}
+            {isAdmin === true ? (
+              <CreateNft />
+            ) : (
+              <Link href="/account">
+                <a className="rounded-button">My Account</a>
+              </Link>
+            )}
           </li>
           <li>
-            <a className="rounded-button" >{connection ? `${connection.selectedAddress.substring(0,6)}...${connection.selectedAddress.substr(-5)}` :"Connect Wallet"}</a>
+            <a className="rounded-button" onClick={connect}>
+              {address
+                ? `${address.substring(0, 6)}...${address.substr(-5)}`
+                : "Connect Wallet"}
+            </a>
           </li>
           <svg
             className={

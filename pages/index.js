@@ -1,36 +1,78 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import MarketNfts from "../components/MarkerNfts";
-import dynamic from "next/dynamic";
 import Intro from "../components/Intro";
 import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
-import { useState, useLayoutEffect,useEffect } from "react";
+import dynamic from "next/dynamic";
+import { Context } from "../components/Context";
+import { useState, useEffect,useContext } from "react";
+
 
 export default function Home() {
-  const [connection, setConnection] = useState(null);
+  const Modal =dynamic(()=> import("../components/Modal"))
+  const providerOptions = {
+    connect: {
+      package: { mustBeMetaMask: false, silent: false, timeout: 100 },
+      options: {
+        rpc: {
+          137: "https://rpc-mumbai.matic.today",
+        },
+        network: "matic",
+      },
+    },
+  };
+
+  const { address, errorInstance, setErrorInstance, setAddress } =
+  useContext(Context).state;
+
   async function connect() {
     try {
-      const web3Model = new Web3Modal();
-      const _connection = await web3Model.connect();
-      setConnection(_connection);
-      console.log({ _connection, address: _connection.selectedAddress });
-      return connect;
+      const web3Model = new Web3Modal({
+        providerOptions,
+      });
+      const connection = await web3Model.connect();
+      await setAddress(connection.selectedAddress);
     } catch (e) {
-      console.log(e.message);
+      setErrorInstance({ ...errorInstance, status: true, message: e.message });
     }
   }
 
-
-  useEffect(async () => {
+  useEffect(async() => {
     await connect();
-  }, [connect]);
+  }, [errorInstance.count]);
+
   return (
     <>
-      <Nav connection={connection} />
+      <Nav  />
       <Intro />
       <Spec />
-      <MarketNfts connection={connection} />
+      {errorInstance.status | !address  ? (
+        <Modal>
+          <div className="upload">
+            <a
+              onClick={() => {
+                setErrorInstance({
+                  ...errorInstance,
+                  status: false,
+                  count: errorInstance.count + 1,
+                });
+              }}
+              style={{ fontSize: "2rem", textAlign: "right" }}
+            >
+              &times;
+            </a>
+            <h5 style={{ textAlign: "center", padding: "7rem" }}>
+              {errorInstance.message?errorInstance.message:"Disconnected"}
+            </h5>
+            <p style={{ textAlign: "center" }}>
+              kindly Install MetaMask and Verify you on the Polygon
+              Network(TestNet)
+            </p>
+          </div>
+        </Modal>
+      ) : null}
+      <MarketNfts />
       <Footer></Footer>
     </>
   );

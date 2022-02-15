@@ -1,23 +1,22 @@
 import { ethers } from "ethers";
-import { create as ipfs_client } from "ipfs-http-client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Modal from "./Modal";
 import Web3Modal from "web3modal";
 import { useRouter } from "next/router";
-import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
-
-const client = ipfs_client({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-  headers: {
-    authorization: `${process.env.projectId}:`,
-  },
-});
+import { Context } from "./Context";
 
 export default function CreateNft() {
+  const {
+    client,
+    nftAddress,
+    Market,
+    NFT,
+    nftMarketPlaceAddress,
+    errorInstance,
+    setErrorInstance,
+    setAddress
+  } = useContext(Context).state;
+
   const [showModal, setModal] = useState();
   const [uploaded, setIsUploaded] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -33,19 +32,20 @@ export default function CreateNft() {
     description: "",
   });
 
-  async function HandleSubmit(e){
-      e.preventDefault();
-      e.preventDefault();
-      setLoading(true)
-      console.log("clicked");
-      await createItem(e);
-      toggleData();
-      setFormData({
-        price: "",
-        name: "",
-        description: "",
-      })
-      setLoading(false)
+  async function HandleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    console.log("clicked");
+    await createItem(e);
+    toggleData();
+    setFormData({
+      price: "",
+      name: "",
+      description: "",
+    });
+    setProgress(0);
+    setLoading(false);
+    setFileUrl(null);
   }
 
   async function fileHandler(e) {
@@ -57,7 +57,7 @@ export default function CreateNft() {
         progress: (prog) => {
           console.log(prog, file_size);
           setIsUploaded(prog == file_size);
-          setProgress(prog/file_size)
+          setProgress(prog / file_size);
         },
       });
       setFileUrl(`https://ipfs.infura.io/ipfs/${_added.path}`);
@@ -75,39 +75,44 @@ export default function CreateNft() {
       const _added = await client.add(data);
       createSales(`https://ipfs.infura.io/ipfs/${_added.path}`);
     } catch (e) {
-      console.log(e.message);
+      console.log(e.message.__proto__);
     }
   }
 
   async function createSales(url) {
-    const web3Model = new Web3Modal();
-    const connection = await web3Model.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    try {
+      const web3Model = new Web3Modal();
+      const connection = await web3Model.connect();
+      setAddress(connection.selectedAddress)
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
 
-    //create Nft
-    let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
-    console.log(url);
-    const _nft = await contract.createToken(url);
-    let tx = await _nft.wait();
-    const tokenId = tx.events[0].args[2].toNumber();
+      //create Nft
+      let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
+      console.log(url);
+      const _nft = await contract.createToken(url);
+      let tx = await _nft.wait();
+      const tokenId = tx.events[0].args[2].toNumber();
 
-    //list Nfts on Market place
-    const price = ethers.utils.parseUnits(formData.price, "ether");
-    contract = new ethers.Contract(nftMarketPlaceAddress, Market.abi, signer);
+      //list Nfts on Market place
+      const price = ethers.utils.parseUnits(formData.price, "ether");
+      contract = new ethers.Contract(nftMarketPlaceAddress, Market.abi, signer);
 
-    let listingPrice = await contract.getListingPrice();
-    listingPrice = listingPrice.toString();
-    const transaction = await contract.createMarketItem(
-      nftAddress,
-      tokenId,
-      price,
-      {
-        value: listingPrice,
-      }
-    );
-    tx = await transaction.wait();
-    return tx.events[0]["transactionHash"];
+      let listingPrice = await contract.getListingPrice();
+      listingPrice = listingPrice.toString();
+      const transaction = await contract.createMarketItem(
+        nftAddress,
+        tokenId,
+        price,
+        {
+          value: listingPrice,
+        }
+      );
+      tx = await transaction.wait();
+      return tx.events[0]["transactionHash"];
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return (
@@ -147,7 +152,12 @@ export default function CreateNft() {
                   setFormData({ ...formData, price: e.target.value })
                 }
               />
-              <input placeholder="Asset" type="file" onChange={fileHandler} required={true} />
+              <input
+                placeholder="Asset"
+                type="file"
+                onChange={fileHandler}
+                required={true}
+              />
               <div className="center">
                 {uploaded ? (
                   <button
@@ -156,10 +166,10 @@ export default function CreateNft() {
                     onClick={HandleSubmit}
                     onSubmit={HandleSubmit}
                     disabled={
-                      !(progress==1.0)
-                      & !(formData.description.length==0)
-                      & !(formData.price && /^\d+$/.test(formData.price))
-                      & !(formData.name.length!=0)
+                      !(progress == 1.0) ||
+                      formData.description.length == 0 ||
+                      !/^\d+$|(\d+[.]\d+)$/.test(formData.price) ||
+                      formData.name.length == 0
                     }
                   >
                     Create Nft

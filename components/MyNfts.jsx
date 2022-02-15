@@ -1,15 +1,22 @@
-import { useState, useEffect } from "react";
-import { useRouter } from 'next/router'
-import Modal from "./Modal";
+import { useState, useEffect, useContext } from "react";
+import { useRouter } from "next/router";
 import { ethers } from "ethers";
 import axios from "axios";
-import Web3Modal from "web3modal";
 import MyNftCard from "./MyNftCard";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
-import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
+import { Context } from "./Context";
+import Web3Modal from "web3modal";
 
 export default function MyNfts() {
+  const {
+    client,
+    nftAddress,
+    Market,
+    NFT,
+    nftMarketPlaceAddress,
+    errorInstance,
+    setErrorInstance,
+    setAddress,
+  } = useContext(Context).state;
   const nftPerPage = 20;
   const [showModal, setModal] = useState();
   const [page, setPage] = useState(1);
@@ -25,41 +32,45 @@ export default function MyNfts() {
   }, []);
 
   async function loadNfts() {
-    const web3Model = new Web3Modal();
-    const connection = await web3Model.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
+    try {
+      const web3Model = new Web3Modal();
+      const connection = await web3Model.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+      const signer = provider.getSigner();
 
-    const contract = new ethers.Contract(
-      nftMarketPlaceAddress,
-      Market.abi,
-      signer
-    );
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
-    const data = await contract.fetchMyNfts(nftPerPage * page);
-    console.log("fetchMyNft", data);
+      const contract = new ethers.Contract(
+        nftMarketPlaceAddress,
+        Market.abi,
+        signer
+      );
+      const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+      const data = await contract.fetchMyNfts(nftPerPage * page);
+      console.log("fetchMyNft", data);
 
-    const items = await Promise.all(
-      data.map(async (elem) => {
-        const tokenURI = await tokenContract.tokenURI(elem.tokenId);
-        const meta = await axios.get(tokenURI);
-        console.log(tokenURI, meta);
-        let price = ethers.utils.formatUnits(elem.price.toString(), "ether");
+      const items = await Promise.all(
+        data.map(async (elem) => {
+          const tokenURI = await tokenContract.tokenURI(elem.tokenId);
+          const meta = await axios.get(tokenURI);
+          console.log(tokenURI, meta);
+          let price = ethers.utils.formatUnits(elem.price.toString(), "ether");
 
-        return {
-          price,
-          tokenId: elem.tokenId.toNumber(),
-          seller: elem.seller,
-          owner: elem.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description,
-        };
-      })
-    );
-    console.log("items", items);
-    setNfts(items);
-    setLoaded(true);
+          return {
+            price,
+            tokenId: elem.tokenId.toNumber(),
+            seller: elem.seller,
+            owner: elem.owner,
+            image: meta.data.image,
+            name: meta.data.name,
+            description: meta.data.description,
+          };
+        })
+      );
+      console.log("items", items);
+      setNfts(items);
+      setLoaded(true);
+    } catch (e) {
+      console.log("qeqe", e.message);
+    }
   }
 
   async function listNft(nft, sell_price) {
@@ -76,13 +87,18 @@ export default function MyNfts() {
     //list Nfts on Market place
     let listingPrice = await contract.getListingPrice();
     const price = ethers.utils.parseUnits(sell_price, "ether");
-    console.log(nftAddress,nft.tokenId,price.toString())
-    const transaction = await contract.listItem(nftAddress,nft.tokenId,price.toString(),{
-        value: listingPrice.toString()
-    });
+    console.log(nftAddress, nft.tokenId, price.toString());
+    const transaction = await contract.listItem(
+      nftAddress,
+      nft.tokenId,
+      price.toString(),
+      {
+        value: listingPrice.toString(),
+      }
+    );
     let tx = await transaction.wait();
     tx.events[0]["transactionHash"];
-    router.push("/")
+    router.push("/");
   }
   return (
     <>
@@ -93,7 +109,15 @@ export default function MyNfts() {
       ) : (
         <section id="my-nfts">
           {nfts.map((nft, i) => {
-            return <MyNftCard nft={nft} key={i} listFunc={async(e)=>{await listNft(nft,e)}}/>;
+            return (
+              <MyNftCard
+                nft={nft}
+                key={i}
+                listFunc={async (e) => {
+                  await listNft(nft, e);
+                }}
+              />
+            );
           })}
         </section>
       )}
