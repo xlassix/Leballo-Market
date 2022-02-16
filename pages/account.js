@@ -66,13 +66,7 @@ export default function AccountPage() {
 }
 
 export async function getStaticProps() {
-  const provider = new ethers.providers.JsonRpcProvider(process.env.rpc);
-  const marketContract = new ethers.Contract(
-    nftMarketPlaceAddress,
-    Market.abi,
-    provider
-  );
-  const data = await marketContract.artist();
+
 
   console.log(data)
 
