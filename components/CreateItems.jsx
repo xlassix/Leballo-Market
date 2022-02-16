@@ -117,9 +117,14 @@ export default function CreateNft() {
 
   return (
     <>
-      <a className="rounded-button" onClick={() => toggleData()}>
-        Upload NFT
-      </a>
+      <svg onClick={() => toggleData()} viewBox="0 0 150 150">
+      <path color="white" d="M71.21 6.91a64.3 64.3 0 1 1 -64.3 64.3 64.37 64.37 0 0 1 64.3 -64.3m0 -6.91a71.21 71.21 0 1 0 71.21 71.21A71.21 71.21 0 0 0 71.21 0Z" />
+
+      <path color="white" d="M88 105.09H54.46A12.59 12.59 0 0 1 41.89 92.52V69.39H48.8V92.52a5.67 5.67 0 0 0 5.66 5.67H88a5.67 5.67 0 0 0 5.67 -5.67V69.39h6.91V92.52A12.59 12.59 0 0 1 88 105.09Z" />
+      <path color="white" d="M56.77 60.34L51.89 55.45 71.45 35.89 90.53 54.97 85.65 59.86 71.45 45.66 56.77 60.34Z" />
+      <path color="white" d="M67.99 40.78H74.9V85.52H67.99V40.78Z" />
+
+      </svg>
       {showModal ? (
         <Modal>
           {!loading ? (

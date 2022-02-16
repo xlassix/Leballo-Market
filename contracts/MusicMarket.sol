@@ -110,7 +110,7 @@ contract MusicMarket is ReentrancyGuard {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(_owner == msg.sender, "Caller must be the owner");
+        require(address(_owner) == msg.sender, "Caller must be the owner");
         _;
     }
 
@@ -119,6 +119,19 @@ contract MusicMarket is ReentrancyGuard {
      */
     function getListingPrice() public view returns (uint256) {
         return listingPrice;
+    }
+
+    function getArtists() public view returns(Artist[] memory data){
+        data = new Artist[](_artistCount.current());
+        for (uint i = 1; i <= data.length; i++) {
+            data[i-1]=(artists[i]);  
+        }
+    }
+    function getAlbums() public view returns(Album[] memory data){
+        data = new Album[](_albumCount.current());
+        for (uint i = 1; i <= data.length; i++) {
+            data[i-1]=(_albums[i]);  
+        }
     }
 
     /**
@@ -156,54 +169,6 @@ contract MusicMarket is ReentrancyGuard {
         );
         return currentArtistId;
     }
-
-    function setArtistAvatar(uint256 artistId, string memory uri)
-        external
-        onlyOwner
-        returns (uint256 artistID)
-    {
-        require(bytes(uri).length != 0, "URI cant be null or empty");
-        require(
-            artistId <= _artistCount.current(),
-            "URI cant be null or empty"
-        );
-        Artist storage _artist = artists[artistId];
-        _artist.url = uri;
-        emit ArtistEvent(
-            artistId,
-            _artist.artistName,
-            _artist.Status,
-            _artist.url,
-            "Artist Avatar set"
-        );
-        return artistId;
-    }
-
-    function getMax(uint256[] memory array) public pure returns (uint256) {
-        uint256 largest = 0;
-        uint256 i;
-
-        for (i = 0; i < array.length; i++) {
-            if (array[i] > largest) {
-                largest = array[i];
-            }
-        }
-        return largest;
-    }
-
-    function checkIfExist(uint256[] memory array, uint256 value)
-        public
-        pure
-        returns (bool)
-    {
-        for (uint256 i = 0; i < array.length; i++) {
-            if (array[i] == value) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     function createAlbum(
         string memory albumName,
         string memory uri,
@@ -211,10 +176,10 @@ contract MusicMarket is ReentrancyGuard {
     ) external onlyOwner returns (uint256 albumId) {
         require(bytes(uri).length != 0, "URI cant be null or empty");
         require(_artists.length != 0, "At least include a length");
-        require(
-            getMax(_artists) <= _artistCount.current(),
-            "The array artists contains an Invalid Id"
-        );
+        // require(
+        //     _artists.getMax() <= _artistCount.current(),
+        //     "The array artists contains an Invalid Id"
+        // );
 
         _albumCount.increment();
         uint256 currentAlbumId = _albumCount.current();
@@ -251,8 +216,6 @@ contract MusicMarket is ReentrancyGuard {
         require(msg.value >= listingPrice, "Insufficent listing fee");
         require(tokenId >= _songCount.current(), "invalid TokenId");
         require(albumId >= _albumCount.current(), "Invalid AlbumId");
-        require(checkIfExist(_albumToArtistMapping[albumId],artistId), "This Artist is Not on the Album");
-
 
         _songCount.increment();
         uint256 currentItemId = _songCount.current();

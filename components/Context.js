@@ -1,8 +1,8 @@
 import { createContext, useState } from "react";
-import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import Market from "../artifacts/contracts/MusicMarket.sol/MusicMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
 import { create as ipfs_client } from "ipfs-http-client";
+import { nftAddress, nftMarketPlaceAddress } from "../config"
 
 //initialize IPFS client
 const client = ipfs_client({
@@ -24,7 +24,7 @@ function Provider(props) {
   const [errorInstance, setErrorInstance] = useState({
     status: false,
     message: "",
-    subtile: "",
+    subTitle: "",
     count: 0,
   });
 
@@ -32,15 +32,15 @@ function Provider(props) {
     address,
     setAddress,
     client,
-    nftAddress,
     Market,
     NFT,
-    nftMarketPlaceAddress,
     errorInstance,
     setErrorInstance,
     setMyWeb3modal,
     currentNft,
     setCurrentNft,
+    nftAddress, 
+    nftMarketPlaceAddress
   };
 
   return (

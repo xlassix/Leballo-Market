@@ -36,7 +36,7 @@ export default function MarketNfts() {
 
   async function loadNfts() {
     const provider = new ethers.providers.JsonRpcProvider(
-      "https://rpc-mumbai.matic.today"
+      process.env.rpc
     );
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
@@ -44,7 +44,7 @@ export default function MarketNfts() {
       Market.abi,
       provider
     );
-    const data = await marketContract.getMarketItems(nftPerPage * page);
+    const data = await marketContract.getSongs(nftPerPage * page);
 
     const items = await Promise.all(
       data.map(async (elem) => {
@@ -83,7 +83,7 @@ export default function MarketNfts() {
       );
       const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
 
-      const transaction = await contract.createMarketItemSale(
+      const transaction = await contract.createSongSale(
         nftAddress,
         nft.tokenId,
         {

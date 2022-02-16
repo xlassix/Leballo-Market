@@ -1,20 +1,26 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ethers } from "ethers";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
-import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
+import { Context } from "./Context";
 import axios from "axios";
 
-
 export default function Intro() {
-  
+  const {
+    client,
+    nftAddress,
+    Market,
+    NFT,
+    nftMarketPlaceAddress,
+    errorInstance,
+    setErrorInstance,
+    setAddress,
+  } = useContext(Context).state;
   const [images, setImages] = useState([
     { id: 0, image: "./img/Asset 1.png" },
     { id: 1, image: "./img/Asset 1.png" },
     { id: 2, image: "./img/Asset 1.png" },
   ]);
   async function loadNfts() {
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.matic.today");
+    const provider = new ethers.providers.JsonRpcProvider(process.env.rpc);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftMarketPlaceAddress,
@@ -23,8 +29,12 @@ export default function Intro() {
     );
     const data = await marketContract.getLastMinted(20);
 
+    if (data.length==0){
+      return 
+    }
+
     const items = await Promise.all(
-      data.map(async (elem,ind) => {
+      data.map(async (elem, ind) => {
         const tokenURI = await tokenContract.tokenURI(elem.tokenId);
         const meta = await axios.get(tokenURI);
         console.log(tokenURI, meta);
@@ -32,7 +42,7 @@ export default function Intro() {
 
         return {
           id: ind,
-          image: meta.data.image
+          image: meta.data.image,
         };
       })
     );
@@ -44,10 +54,8 @@ export default function Intro() {
     loadNfts();
   }, []);
 
-
-
   function changeImg() {
-    setImages([...images.slice(1,),...images.slice(0,1)]);
+    setImages([...images.slice(1), ...images.slice(0, 1)]);
   }
   return (
     <section id="intro">

@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import Link from "next/link";
-import CreateNft from "./CreateItems";
 import { useRouter } from "next/router";
 import { Context } from "./Context";
 import Web3Modal from "web3modal";
@@ -58,13 +57,9 @@ function Nav({ isAdmin}) {
             </form>
           </li>
           <li>
-            {isAdmin === true ? (
-              <CreateNft />
-            ) : (
               <Link href="/account">
                 <a className="rounded-button">My Account</a>
               </Link>
-            )}
           </li>
           <li>
             <a className="rounded-button" onClick={connect}>

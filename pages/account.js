@@ -8,9 +8,11 @@ import { useContext,useEffect,useState } from "react";
 import { Context } from "../components/Context";
 import Web3Modal from "web3modal";
 
+
+
 export default function AccountPage() {
   const Modal = dynamic(() => import("../components/Modal"));
-  const { address, errorInstance, setErrorInstance, setAddress } =
+  const { address, errorInstance, setErrorInstance, setAddress, } =
     useContext(Context).state;
     async function connect(){
       try{
@@ -30,7 +32,7 @@ export default function AccountPage() {
     <>
       <Nav isAdmin={true} />
       <div className="bg-dark">
-        <Profile></Profile>
+        <Profile />
         <MyNfts />
         <Footer></Footer>
         {errorInstance.status || !address ? (
@@ -52,8 +54,8 @@ export default function AccountPage() {
                 {errorInstance.message ? errorInstance.message : "Disconnected"}
               </h5>
               <p style={{ textAlign: "center" }}>
-                kindly Install Metabase and Verify you on the Polygon
-                Network(TestNet)
+              {errorInstance.subTitle? errorInstance.subTitle:
+                "kindly Install Metabase and Verify you on the Polygon Network(TestNet)"}
               </p>
             </div>
           </Modal>
@@ -61,4 +63,23 @@ export default function AccountPage() {
       </div>
     </>
   );
+}
+
+export async function getStaticProps() {
+  const provider = new ethers.providers.JsonRpcProvider(process.env.rpc);
+  const marketContract = new ethers.Contract(
+    nftMarketPlaceAddress,
+    Market.abi,
+    provider
+  );
+  const data = await marketContract.artist();
+
+  console.log(data)
+
+  return {
+    props: {
+      data,
+    },
+    revalidate: 30, // In seconds
+  }
 }

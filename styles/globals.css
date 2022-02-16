@@ -807,6 +807,18 @@ figcaption {
   grid-row: 1/2;
 }
 
+.actions{
+  display: flex;
+  gap:1.5rem;
+  justify-content: center;
+}
+.actions>svg{
+  transform: scale(2);
+}
+#more-intro svg{
+  transform: scale(2);
+}
+
 #create-nfts {
   display: flex;
   justify-content: space-between;
@@ -1046,6 +1058,8 @@ section.flex > :last-child {
 .nft-detail .rounded-button {
   padding: 0.6rem 2rem;
 }
+
+
 
 .nft-detail .rounded-button {
   padding: 0.6rem 2rem;
@@ -1414,9 +1428,6 @@ ul.flex > li:first-child {
   }
   footer {
     grid-template-columns: 1fr;
-  }
-  #more-intro > div:last-child img {
-    max-height: 50px;
   }
 
   #my-nfts {
