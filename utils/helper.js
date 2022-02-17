@@ -5,6 +5,8 @@ import { ethers } from "ethers";
 import { pick } from "underscore";
 import axios from "axios";
 
+const rpc="https://rpc-mumbai.matic.today"
+
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
   "itemId",
@@ -12,12 +14,13 @@ const songKeys = [
   "owner",
   "price",
   "albumId",
+  "status",
   "trackNumber",
   "artistId",
 ];
 
 export async function getAlbums() {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const marketContract = new ethers.Contract(
     nftMarketPlaceAddress,
     Market.abi,
@@ -27,17 +30,17 @@ export async function getAlbums() {
 }
 
 export async function getOwner() {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const marketContract = new ethers.Contract(
     nftMarketPlaceAddress,
     Market.abi,
     provider
   );
-  return await marketContract.owner();
+  return (await marketContract.owner()).toString().toLowerCase();
 }
 
 export async function getAlbum(id) {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const marketContract = new ethers.Contract(
     nftMarketPlaceAddress,
     Market.abi,
@@ -47,7 +50,7 @@ export async function getAlbum(id) {
 }
 
 export async function getArtists() {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const marketContract = new ethers.Contract(
     nftMarketPlaceAddress,
     Market.abi,
@@ -59,7 +62,7 @@ export async function getArtists() {
 }
 
 export async function getSong(id) {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const marketContract = new ethers.Contract(
     nftMarketPlaceAddress,
     Market.abi,
@@ -77,7 +80,7 @@ export async function getSong(id) {
 
 
 export async function getMetadata(tokenId) {
-  const provider = new ethers.providers.JsonRpcProvider();
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
   const tokenURI = await tokenContract.tokenURI(tokenId);
   return await axios.get(tokenURI);
