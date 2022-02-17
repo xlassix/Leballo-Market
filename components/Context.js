@@ -36,7 +36,6 @@ function Provider(props) {
     NFT,
     errorInstance,
     setErrorInstance,
-    setMyWeb3modal,
     currentNft,
     setCurrentNft,
     nftAddress, 

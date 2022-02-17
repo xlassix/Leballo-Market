@@ -29,25 +29,25 @@ export default function Intro() {
     );
     const data = await marketContract.getLastMinted(20);
 
-    if (data.length==0){
-      return 
+    if (data.length == 0) {
+      return;
     }
-
     const items = await Promise.all(
       data.map(async (elem, ind) => {
+        console.log(elem.tokenId,ind)
         const tokenURI = await tokenContract.tokenURI(elem.tokenId);
         const meta = await axios.get(tokenURI);
         console.log(tokenURI, meta);
-        let price = ethers.utils.formatUnits(elem.price.toString(), "ether");
-
         return {
           id: ind,
           image: meta.data.image,
         };
       })
     );
-    console.log("items", items);
-    setImages(items);
+    if (items.length >= 3) {
+      console.log("items", items);
+      setImages(items);
+    }
   }
 
   useEffect(() => {
@@ -85,21 +85,21 @@ export default function Intro() {
         <div className="img-slider" id="img-slider">
           <img
             className="first"
-            src={images[0].image}
+            src={images[0] ? images[0].image : "./img/Asset 1.png"}
             alt="test image"
             key={images[0].id}
           />
           <img
             className="second"
-            src={images[1].image}
-            alt="test image"
+            src={images[1] ? images[1].image : "./img/Asset 1.png"}
+            alt="test image2"
             onClick={() => changeImg()}
             key={images[1].id}
           />
           <img
             className="third"
-            src={images[2].image}
-            alt="test image"
+            src={images[2] ? images[2].image : "./img/Asset 1.png"}
+            alt="test image3"
             key={images[2].id}
             onClick={() => changeImg()}
           />

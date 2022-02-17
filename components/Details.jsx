@@ -1,38 +1,37 @@
-import { useState, useContext,useEffect } from "react";
+import { useState, useContext,useEffect} from "react";
 import { Context } from "./Context";
-import { useRouter } from "next/router";
+import { getSong, getAlbum } from "../utils/helper";
+import axios from "axios";
+import BuySong from "./BuySong";
 
 
-export default function DetailNft() {
-  const {
-    client,
-    nftAddress,
-    Market,
-    NFT,
-    nftMarketPlaceAddress,
-    errorInstance,
-    setErrorInstance,
-    setAddress,
-    currentNft
-  } = useContext(Context).state;
-  const router = useRouter();
-  const [nft,setNft]=useState(currentNft);
 
-  useEffect(()=>{
-    console.log("adad")
-    if(!nft.image){
-      return router.push("/")
-    }
-  },[nft])
+export default function DetailNft({id}) {
+  const {address} =useContext(Context);
+  const [nft,setNft]=useState({});
+  const [loaded,setLoaded]=useState(false);
+
+  
+
+  useEffect(async()=>{
+    console.log(id)
+    setNft(await getSong(id))
+    setLoaded(true)
+    console.log(nft)
+  },[id])
 
 
   return (
+    <>
+    {console.log(nft)}
+    {loaded ?
     <section className="flex">
-        <img src={nft.image} />
+    {console.log(nft)}
+        <img src={nft.meta.image} />
         <div className="nft-detail">
           <div className="title">
             <div className="flex flex-center">
-              <h5>{currentNft.name}</h5>
+              <h5>{nft.meta.name}</h5>
               <div className="flex flex-center">
                 <svg style={{fill: "var(--color-orange)"}} viewBox="0 0 157 134">
                   <path
@@ -50,15 +49,17 @@ export default function DetailNft() {
                     d="M11.944 17.97L4.58 13.62 11.943 24l7.37 -10.38 -7.372 4.35h0.003zM12.056 0L4.69 12.223l7.365 4.354 7.365 -4.35L12.056 0z"
                   />
                 </svg>
-                <p>0.25 USD</p>
+                <p>{nft.formatted_price}</p>
               </div>
-              <p>20 out of 100 Available</p>
+              <p>{`${nft.trackNumber.toNumber()}`} out of {`${nft.album["_album"]["mintedSongs"].toNumber()}`} </p>
             </div>
           </div>
           <div>
             <div className="flex flex-center">
-              <div className="blank_sq_image" style={{"--length": "3rem"}}></div>
-              Artist Name
+              <div className="img-avatar" style={{"--length": "3rem"}}>
+                <img src={nft["artistUrl"]} />
+              </div>
+              {nft.meta.artist}
             </div>
             <ul className="flex">
               <li>
@@ -72,21 +73,25 @@ export default function DetailNft() {
               </li>
             </ul>
             <p>
-            {currentNft.description}
+            {nft.meta.description}
             </p>
           </div>
           <div className="btn-group flex">
-            <a className="rounded-button btn-grad">buy now</a>
+          {nft.owner=="0x0000000000000000000000000000000000000000" ||nft.owner==address ?
+          <>
+            <BuySong nft={nft} />
             <a className="rounded-button btn-border">Place Order</a>
+            </>
+            :null
+          }
           </div>
         </div>
       </section>
+      :
+        <div className="center" style={{padding:"4rem auto"}}>
+          loading
+        </div>
+      }
+      </>
   );
-}
-
-export async function getServerSideProps() {
-  // Fetch data from external API
-
-  // Pass data to the page via props
-  return { props: { data } }
 }

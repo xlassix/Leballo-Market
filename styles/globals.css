@@ -625,7 +625,24 @@ figcaption {
   margin: 0;
   padding: 0;
 }
+#multiSelect div[class$=-ValueContainer]{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding:0.2rem
+}
+#multiSelect div[class$=-ValueContainer]>div:last-child{
+  height: 1px;
+  color: transparent;
+}
 
+.img-avatar{
+  width: 3rem;
+}
+.img-avatar>img{
+  border-radius:3rem ;
+}
 #featured {
   display: flex;
   gap: 1.75rem;

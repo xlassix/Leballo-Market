@@ -84,7 +84,7 @@ describe("MusicNft market", async function () {
     //validate Artist exist
     tx = await market.getAlbum(album1["albumId"].toString());
     expect(tx["_artists"]).to.be.an("Array");
-    expect(tx["_artists"].map((x) => x.toString())).to.have.members([
+    expect(tx["_artists"].map((x) => x["id"].toString())).to.have.members([
       eminemData["artistId"].toString(),
       nfData["artistId"].toString(),
     ]);
@@ -169,7 +169,7 @@ describe("MusicNft market", async function () {
     //validate Artist exist
     tx = await market.getAlbum(album1["albumId"].toString());
     expect(tx["_artists"]).to.be.an("Array");
-    expect(tx["_artists"].map((x) => x.toString())).to.have.members([
+    expect(tx["_artists"].map((x) => x["id"].toString())).to.have.members([
       eminemData["artistId"].toString(),
       nfData["artistId"].toString(),
     ]);
@@ -182,9 +182,6 @@ describe("MusicNft market", async function () {
       album1["albumId"].toString(),
       eminemData["artistId"].toString(),
       auction_price,
-      {
-        value: listingPrice,
-      }
     );
     var data1 = await tx.wait();
 
@@ -195,13 +192,17 @@ describe("MusicNft market", async function () {
       album1["albumId"].toString(),
       eminemData["artistId"].toString(),
       auction_price,
-      {
-        value: listingPrice,
-      }
     );
     tx = await market.getItemByTokenId(tokenId2);
 
     const data= await market.getAlbum(album1["albumId"].toString());
     expect(data["_album"]["mintedSongs"].toString()).to.equal("2");
+
+    const [_, buyerAddress] = await ethers.getSigners();
+    tx=await market
+      .connect(buyerAddress)
+      .createSongSale(nftAddress, 1, { value: auction_price });
+
+    tx= await  tx.wait()
   });
 });

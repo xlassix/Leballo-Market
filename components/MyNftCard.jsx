@@ -1,7 +1,6 @@
 import Modal from "./Modal";
-import { useState,useContext } from "react";
-export default function MyNftCard({ nft, listFunc }) {
-
+import { useState, useContext } from "react";
+export default function MyNftCard({ nft, onClickFunc, cancel }) {
   const [showModal, setModal] = useState(false);
   const [sellingPrice, setSellingPrice] = useState();
   const [loading, setLoading] = useState(true);
@@ -22,11 +21,7 @@ export default function MyNftCard({ nft, listFunc }) {
             toggleData();
           }}
         />
-        <figcaption
-          onClick={() => {
-            toggleData();
-          }}
-        >
+        <figcaption>
           <h5>{nft.name}</h5>
           <div className="flex flex-center">
             <p>{nft.price}</p>
@@ -40,6 +35,7 @@ export default function MyNftCard({ nft, listFunc }) {
               <p>96</p>
             </div>
           </div>
+          <p>{nft.status}</p>
         </figcaption>
       </figure>
       {showModal ? (
@@ -53,21 +49,29 @@ export default function MyNftCard({ nft, listFunc }) {
             </a>
             {loading ? (
               <>
-                <input
-                  placeholder="Asset Price"
-                  type="number"
-                  required
-                  onChange={(e) => setSellingPrice(e.target.value)}
-                />
+                {cancel ? (
+                  <input
+                    placeholder="Asset Price"
+                    type="number"
+                    required
+                    onChange={(e) => setSellingPrice(e.target.value)}
+                  />
+                ) : (
+                  <p style={{ textAlign: "center", padding: "7rem 0" }}>
+                    Proceed to cancel Listing
+                  </p>
+                )}
                 <div className="center">
                   <a
                     onClick={async () => {
                       setLoading(true);
-                      await listFunc(sellingPrice);
+                      await onClickFunc(sellingPrice);
                     }}
                     className="rounded-button"
                   >
-                    list
+                    {cancel ? 
+                    "list":"Cancel Listing"
+                    }
                   </a>
                 </div>
               </>

@@ -56,6 +56,7 @@ export default function MarketNfts() {
         return {
           price,
           tokenId: elem.tokenId.toNumber(),
+          id: elem.itemId.toNumber(),
           seller: elem.seller,
           owner: elem.owner,
           image: meta.data.image,
@@ -145,8 +146,7 @@ export default function MarketNfts() {
               return (
                 <MarketNftCard
                   onclick={() => {
-                    setCurrentNft(nft),
-                    router.push("/detail");
+                    router.push(`/song/${nft.id}`);
                   }}
                   nft={nft}
                   key={i}

@@ -86,8 +86,6 @@ export default function CreateArtist() {
       //create Nft
       console.log(nftMarketPlaceAddress,Market)
       let contract = new ethers.Contract(nftMarketPlaceAddress, Market.abi, signer);
-      const owner = await contract.owner()
-      console.log("sdsd",owner);
       const _nft = await contract.createArtist(name, url);
 
       let tx = await _nft.wait();
