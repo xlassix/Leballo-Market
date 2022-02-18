@@ -5,7 +5,7 @@ import Web3Modal from "web3modal";
 import { useRouter } from "next/router";
 import { Context } from "./Context";
 
-export default function BuySong({nft}) {
+export default function BuySong({ nft }) {
   const {
     Market,
     NFT,
@@ -14,6 +14,7 @@ export default function BuySong({nft}) {
     nftAddress,
     nftMarketPlaceAddress,
   } = useContext(Context).state;
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [showModal, setModal] = useState();
@@ -38,25 +39,36 @@ export default function BuySong({nft}) {
         signer
       );
       const price = ethers.utils.parseUnits(nft.formatted_price, "ether");
-      console.log(nft.formatted_price,price,nft.itemId,price.toString())
+      console.log(nft.formatted_price, price, nft.itemId, price.toString());
 
-      const transaction = await contract.createSongSale(
-        nftAddress,
-        nft.itemId.toNumber(),
-        {
-          value: price.toString(),
-        }
-      );
-      console.log(transaction)
+      if (nft.owner == "0x0000000000000000000000000000000000000000") {
+        const transaction = await contract.createSongSale(
+          nftAddress,
+          nft.itemId.toNumber(),
+          {
+            value: price.toString(),
+          }
+        );
+      }else{
+        const transaction = await contract.BuySong(
+            nftAddress,
+            nft.tokenId.toNumber(),
+            {
+              value: price.toString(),
+            }
+        );
+      }
+      console.log(transaction);
 
       await transaction.wait();
+      router.push("/account");
     } catch (e) {
       console.log(e);
       setErrorInstance({
         ...errorInstance,
         status: true,
         message: e.message,
-        subtitle: e.data.message,
+        subTitle: e.data?e.data.message:"",
       });
     }
   }
@@ -66,15 +78,17 @@ export default function BuySong({nft}) {
   }
   return (
     <>
-      <a onClick={toggleData} className="rounded-button btn-grad">buy now</a>
+      <a onClick={toggleData} className="rounded-button btn-grad">
+        buy now
+      </a>
       {showModal ? (
         <Modal>
-              <a
-                onClick={() => toggleData()}
-                style={{ fontSize: "2rem", textAlign: "right" }}
-              >
-                &times;
-              </a>
+          <a
+            onClick={() => toggleData()}
+            style={{ fontSize: "2rem", textAlign: "right" }}
+          >
+            &times;
+          </a>
           {!loading ? (
             <form className="upload">
               <div className="center">
@@ -84,7 +98,6 @@ export default function BuySong({nft}) {
               </div>
             </form>
           ) : (
-              
             <p style={{ textAlign: "center", padding: "7rem" }}>
               Processing....
             </p>

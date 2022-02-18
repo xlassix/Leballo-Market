@@ -62,7 +62,6 @@ export default function CreateSong() {
     e.preventDefault();
     setLoading(true);
     await createItem(e);
-    toggleData();
     setFormData({
       price: "",
       name: "",
@@ -71,6 +70,7 @@ export default function CreateSong() {
     setProgress(0);
     setLoading(false);
     setFileUrl(null);
+    toggleData();
   }
 
   async function fileHandler(e) {
