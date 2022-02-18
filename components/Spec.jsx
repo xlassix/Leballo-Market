@@ -1,3 +1,4 @@
+import ScrollAnimation from "react-animate-on-scroll";
 export default function Spec() {
   return (
     <div className="bgcolor_lit_purple">
@@ -93,7 +94,7 @@ export default function Spec() {
                 </div>
                 <p>1 of 8</p>
               </div>
-              <button className="rounded-button invented-btn">
+              <button disabled={true} className="rounded-button invented-btn">
                 Place a Bid
               </button>
             </div>
@@ -121,7 +122,7 @@ export default function Spec() {
                 </div>
                 <p>1 of 8</p>
               </div>
-              <button className="rounded-button invented-btn">
+              <button disabled={true} className="rounded-button invented-btn">
                 Place a Bid
               </button>
             </div>
@@ -149,7 +150,7 @@ export default function Spec() {
                 </div>
                 <p>1 of 8</p>
               </div>
-              <button className="rounded-button invented-btn">
+              <button disabled={true}  className="rounded-button invented-btn">
                 Place a Bid
               </button>
             </div>
@@ -276,68 +277,71 @@ export default function Spec() {
           </div>
         </div>
       </section>
-      <section id="nft-collections">
-        <h2>COLLECTION FEATURED NFTS</h2>
-        <div id="collections">
-          <div>
-            <div className="collection">
-              <img className="main" src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
+
+      <ScrollAnimation animateIn="fadeIn">
+        <section id="nft-collections">
+          <h2>COLLECTION FEATURED NFTS</h2>
+          <div id="collections">
+            <div>
+              <div className="collection">
+                <img className="main" src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+              </div>
+              <h4>Amazing collection</h4>
+              <div className="flex flex-center">
+                <div
+                  className="blank_sq_image"
+                  style={{ "--length": "3rem" }}
+                ></div>
+                <p>By Artist Name</p>
+                <button className="rounded-button flex-leftmost invented-btn">
+                  Total 57 items
+                </button>
+              </div>
             </div>
-            <h4>Amazing collection</h4>
-            <div className="flex flex-center">
-              <div
-                className="blank_sq_image"
-                style={{ "--length": "3rem" }}
-              ></div>
-              <p>By Artist Name</p>
-              <button className="rounded-button flex-leftmost invented-btn">
-                Total 57 items
-              </button>
+            <div>
+              <div className="collection">
+                <img className="main" src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+              </div>
+              <h4>Amazing collection</h4>
+              <div className="flex flex-center">
+                <div
+                  className="blank_sq_image"
+                  style={{ "--length": "3rem" }}
+                ></div>
+                <p>By Artist Name</p>
+                <button className="rounded-button flex-leftmost invented-btn">
+                  Total 57 items
+                </button>
+              </div>
+            </div>
+            <div>
+              <div className="collection">
+                <img className="main" src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+                <img src="./img/Asset 1.png" />
+              </div>
+              <h4>Amazing collection</h4>
+              <div className="flex flex-center">
+                <div
+                  className="blank_sq_image"
+                  style={{ "--length": "3rem" }}
+                ></div>
+                <p>By Artist Name</p>
+                <button className="rounded-button flex-leftmost invented-btn">
+                  Total 57 items
+                </button>
+              </div>
             </div>
           </div>
-          <div>
-            <div className="collection">
-              <img className="main" src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-            </div>
-            <h4>Amazing collection</h4>
-            <div className="flex flex-center">
-              <div
-                className="blank_sq_image"
-                style={{ "--length": "3rem" }}
-              ></div>
-              <p>By Artist Name</p>
-              <button className="rounded-button flex-leftmost invented-btn">
-                Total 57 items
-              </button>
-            </div>
-          </div>
-          <div>
-            <div className="collection">
-              <img className="main" src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-              <img src="./img/Asset 1.png" />
-            </div>
-            <h4>Amazing collection</h4>
-            <div className="flex flex-center">
-              <div
-                className="blank_sq_image"
-                style={{ "--length": "3rem" }}
-              ></div>
-              <p>By Artist Name</p>
-              <button className="rounded-button flex-leftmost invented-btn">
-                Total 57 items
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollAnimation>
     </div>
   );
 }
