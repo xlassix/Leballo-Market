@@ -625,7 +625,24 @@ figcaption {
   margin: 0;
   padding: 0;
 }
+#multiSelect div[class$=-ValueContainer]{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding:0.2rem
+}
+#multiSelect div[class$=-ValueContainer]>div:last-child{
+  height: 1px;
+  color: transparent;
+}
 
+.img-avatar{
+  width: 3rem;
+}
+.img-avatar>img{
+  border-radius:3rem ;
+}
 #featured {
   display: flex;
   gap: 1.75rem;
@@ -805,6 +822,18 @@ figcaption {
 .image-with-verification > img {
   grid-column: 2/3;
   grid-row: 1/2;
+}
+
+.actions{
+  display: flex;
+  gap:1.5rem;
+  justify-content: center;
+}
+.actions>svg{
+  transform: scale(2);
+}
+#more-intro svg{
+  transform: scale(2);
 }
 
 #create-nfts {
@@ -1047,6 +1076,8 @@ section.flex > :last-child {
   padding: 0.6rem 2rem;
 }
 
+
+
 .nft-detail .rounded-button {
   padding: 0.6rem 2rem;
 }
@@ -1184,7 +1215,7 @@ ul.flex > li:first-child {
 }
 #my-nfts figure img {
   border-radius: 1rem;
-  min-height: 15rem;
+  height: 15rem;
 }
 #my-nfts figure figcaption {
   padding: 1rem 1rem 0 1rem;
@@ -1374,6 +1405,12 @@ ul.flex > li:first-child {
   #intro div:last-child {
     display: none;
   }
+  section.flex {
+    display: block;
+  }
+  section.flex > :first-child {
+    width: 100%;
+  }
 }
 
 @media (max-width: 550px) {
@@ -1415,12 +1452,13 @@ ul.flex > li:first-child {
   footer {
     grid-template-columns: 1fr;
   }
-  #more-intro > div:last-child img {
-    max-height: 50px;
-  }
 
   #my-nfts {
     grid-template-columns: 1fr;
+  }
+  #my-nfts figure img {
+    border-radius: 1rem;
+    height: 20rem;
   }
   .profile-pic {
     --radius: 50px;

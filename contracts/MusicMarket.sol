@@ -12,7 +12,7 @@ contract MusicMarket is ReentrancyGuard {
     Counters.Counter private _artistCount;
     Counters.Counter private _albumCount;
     Counters.Counter private _currentListings;
-    address payable _owner;
+    address payable public owner;
     uint256 private listingPrice = 0.025 ether;
 
     //Defined Enums
@@ -20,11 +20,6 @@ contract MusicMarket is ReentrancyGuard {
         Active,
         Sold,
         Reserved
-    }
-    enum ArtistStatus {
-        NotVerified,
-        Verified,
-        Dropped
     }
     enum AlbumStatus {
         Reserved,
@@ -46,11 +41,12 @@ contract MusicMarket is ReentrancyGuard {
         SongStatus status;
     }
     struct Artist {
+        uint256 id;
         string artistName;
-        ArtistStatus Status;
         string url;
     }
     struct Album {
+        uint256 id;
         string albumName;
         uint256 createdAt;
         AlbumStatus Status;
@@ -94,23 +90,22 @@ contract MusicMarket is ReentrancyGuard {
     event ArtistEvent(
         uint256 indexed artistId,
         string artistName,
-        ArtistStatus Status,
         string url,
         string message
     );
 
     /**
-     * @dev Initialized Constructor and set value _owner.
+     * @dev Initialized Constructor and set value owner.
      */
     constructor() {
-        _owner = payable(msg.sender);
+        owner = payable(msg.sender);
     }
 
     /**
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(_owner == msg.sender, "Caller must be the owner");
+        require(address(owner) == msg.sender, "Caller must be the owner");
         _;
     }
 
@@ -121,6 +116,20 @@ contract MusicMarket is ReentrancyGuard {
         return listingPrice;
     }
 
+    function getArtists() public view returns (Artist[] memory data) {
+        data = new Artist[](_artistCount.current());
+        for (uint256 i = 1; i <= data.length; i++) {
+            data[i - 1] = (artists[i]);
+        }
+    }
+
+    function getAlbums() public view returns (Album[] memory data) {
+        data = new Album[](_albumCount.current());
+        for (uint256 i = 1; i <= data.length; i++) {
+            data[i - 1] = (_albums[i]);
+        }
+    }
+
     /**
      * @dev set current Listing Price(can only be performed by the Owner)
      */
@@ -129,7 +138,7 @@ contract MusicMarket is ReentrancyGuard {
         onlyOwner
         returns (uint256)
     {
-        require(_owner == msg.sender, "Only the Owner Can set Listing Price");
+        require(owner == msg.sender, "Only the Owner Can set Listing Price");
         listingPrice = price;
         return listingPrice;
     }
@@ -142,66 +151,9 @@ contract MusicMarket is ReentrancyGuard {
         require(bytes(uri).length != 0, "URI cant be null or empty");
         _artistCount.increment();
         uint256 currentArtistId = _artistCount.current();
-        artists[currentArtistId] = Artist(
-            artistName,
-            ArtistStatus.NotVerified,
-            uri
-        );
-        emit ArtistEvent(
-            currentArtistId,
-            artistName,
-            ArtistStatus.NotVerified,
-            uri,
-            "Artist Created"
-        );
+        artists[currentArtistId] = Artist(currentArtistId, artistName, uri);
+        emit ArtistEvent(currentArtistId, artistName, uri, "Artist Created");
         return currentArtistId;
-    }
-
-    function setArtistAvatar(uint256 artistId, string memory uri)
-        external
-        onlyOwner
-        returns (uint256 artistID)
-    {
-        require(bytes(uri).length != 0, "URI cant be null or empty");
-        require(
-            artistId <= _artistCount.current(),
-            "URI cant be null or empty"
-        );
-        Artist storage _artist = artists[artistId];
-        _artist.url = uri;
-        emit ArtistEvent(
-            artistId,
-            _artist.artistName,
-            _artist.Status,
-            _artist.url,
-            "Artist Avatar set"
-        );
-        return artistId;
-    }
-
-    function getMax(uint256[] memory array) public pure returns (uint256) {
-        uint256 largest = 0;
-        uint256 i;
-
-        for (i = 0; i < array.length; i++) {
-            if (array[i] > largest) {
-                largest = array[i];
-            }
-        }
-        return largest;
-    }
-
-    function checkIfExist(uint256[] memory array, uint256 value)
-        public
-        pure
-        returns (bool)
-    {
-        for (uint256 i = 0; i < array.length; i++) {
-            if (array[i] == value) {
-                return true;
-            }
-        }
-        return false;
     }
 
     function createAlbum(
@@ -211,14 +163,15 @@ contract MusicMarket is ReentrancyGuard {
     ) external onlyOwner returns (uint256 albumId) {
         require(bytes(uri).length != 0, "URI cant be null or empty");
         require(_artists.length != 0, "At least include a length");
-        require(
-            getMax(_artists) <= _artistCount.current(),
-            "The array artists contains an Invalid Id"
-        );
+        // require(
+        //     _artists.getMax() <= _artistCount.current(),
+        //     "The array artists contains an Invalid Id"
+        // );
 
         _albumCount.increment();
         uint256 currentAlbumId = _albumCount.current();
         _albums[currentAlbumId] = Album(
+            currentAlbumId,
             albumName,
             block.timestamp,
             AlbumStatus.Reserved,
@@ -246,13 +199,10 @@ contract MusicMarket is ReentrancyGuard {
         uint256 albumId,
         uint256 artistId,
         uint256 price
-    ) public payable nonReentrant {
+    ) external onlyOwner nonReentrant {
         require(price > 0, "Item Price most be greater then 1 WEI");
-        require(msg.value >= listingPrice, "Insufficent listing fee");
         require(tokenId >= _songCount.current(), "invalid TokenId");
-        require(albumId >= _albumCount.current(), "Invalid AlbumId");
-        require(checkIfExist(_albumToArtistMapping[albumId],artistId), "This Artist is Not on the Album");
-
+        require(albumId <= _albumCount.current(), "Invalid AlbumId");
 
         _songCount.increment();
         uint256 currentItemId = _songCount.current();
@@ -341,7 +291,6 @@ contract MusicMarket is ReentrancyGuard {
         currentToken.owner = payable(msg.sender);
         _musicMarketCount.increment();
         currentToken.seller.transfer(price);
-        _owner.transfer(listingPrice);
         itemIdToSong[itemId] = currentToken;
         emit SongEvent(
             itemId,
@@ -383,7 +332,7 @@ contract MusicMarket is ReentrancyGuard {
             tokenId,
             musicContract,
             msg.sender,
-            _owner,
+            owner,
             price,
             currentToken.albumId,
             currentToken.trackNumber,
@@ -393,7 +342,11 @@ contract MusicMarket is ReentrancyGuard {
         );
     }
 
-    function CancelItem(address musicContract, uint256 itemId) public payable {
+    function CancelItem(address musicContract, uint256 itemId)
+        public
+        payable
+        nonReentrant
+    {
         Song storage currentToken = itemIdToSong[itemId];
         uint256 tokenId = currentToken.tokenId;
         require(
@@ -405,13 +358,13 @@ contract MusicMarket is ReentrancyGuard {
             "Cant list that is already unListed"
         );
         currentToken.status = SongStatus.Sold;
-        _currentListings.increment();
+        _currentListings.decrement();
         emit SongEvent(
             itemId,
             tokenId,
             musicContract,
             msg.sender,
-            _owner,
+            owner,
             currentToken.price,
             currentToken.albumId,
             currentToken.trackNumber,
@@ -438,10 +391,18 @@ contract MusicMarket is ReentrancyGuard {
     function getAlbum(uint256 albumId)
         external
         view
-        returns (Album memory _album, uint256[] memory _artists)
+        returns (Album memory _album, Artist[] memory _artists)
     {
         require(_albumCount.current() >= albumId, "Invalid Token ID");
-        return (_albums[albumId], _albumToArtistMapping[albumId]);
+        _album = _albums[albumId];
+        _artists = new Artist[](_albumToArtistMapping[albumId].length);
+        for (
+            uint256 index = 0;
+            index < _albumToArtistMapping[albumId].length;
+            index++
+        ) {
+            _artists[index] = artists[_albumToArtistMapping[albumId][index]];
+        }
     }
 
     function getLastMinted(uint256 limit) public view returns (Song[] memory) {
@@ -474,9 +435,7 @@ contract MusicMarket is ReentrancyGuard {
             _musicMarketCount.current();
         uint256 currentIndex = 0;
         uint256 _min = Math.min(limit, unsoldItemCount);
-
         Song[] memory unsoldItem = new Song[](_min);
-
         for (uint256 index = 0; index < itemCount; index++) {
             if (currentIndex == _min) {
                 break;

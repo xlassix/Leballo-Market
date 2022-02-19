@@ -44,7 +44,7 @@ export default function MyNfts() {
         signer
       );
       const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
-      const data = await contract.fetchMyNfts(nftPerPage * page);
+      const data = await contract.fetchMyMusicNFTs(nftPerPage * page);
       console.log("fetchMyNft", data);
 
       const items = await Promise.all(
@@ -57,10 +57,12 @@ export default function MyNfts() {
           return {
             price,
             tokenId: elem.tokenId.toNumber(),
+            id: elem.itemId.toNumber(),
             seller: elem.seller,
             owner: elem.owner,
             image: meta.data.image,
             name: meta.data.name,
+            status: elem.status == 0 ? "listed" : "Purchased",
             description: meta.data.description,
           };
         })
@@ -90,7 +92,7 @@ export default function MyNfts() {
     console.log(nftAddress, nft.tokenId, price.toString());
     const transaction = await contract.listItem(
       nftAddress,
-      nft.tokenId,
+      nft.id,
       price.toString(),
       {
         value: listingPrice.toString(),
@@ -99,6 +101,23 @@ export default function MyNfts() {
     let tx = await transaction.wait();
     tx.events[0]["transactionHash"];
     router.push("/");
+  }
+
+  async function cancelListing(nft) {
+    const web3Model = new Web3Modal();
+    const connection = await web3Model.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+
+    const contract = new ethers.Contract(
+      nftMarketPlaceAddress,
+      Market.abi,
+      signer
+    );
+    const transaction = await contract.CancelItem(nftAddress, nft.id);
+    let tx = await transaction.wait();
+    tx.events[0]["transactionHash"];
+    router.push(`/song/${nft.id}`);
   }
   return (
     <>
@@ -113,8 +132,13 @@ export default function MyNfts() {
               <MyNftCard
                 nft={nft}
                 key={i}
-                listFunc={async (e) => {
-                  await listNft(nft, e);
+                cancel={nft.status === "Purchased"}
+                onClickFunc={async (e) => {
+                  if (nft.status === "Purchased") {
+                    await listNft(nft, e);
+                  } else {
+                    await cancelListing(nft);
+                  }
                 }}
               />
             );

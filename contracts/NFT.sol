@@ -34,5 +34,18 @@ contract NFT is ERC721URIStorage{
         setApprovalForAll(contractAddress,true);
         return newTokenId;
     }
+
+
+    function getMax(uint256[] memory array) public pure returns (uint256) {
+        uint256 largest = 0;
+        uint256 i;
+
+        for (i = 0; i < array.length; i++) {
+            if (array[i] > largest) {
+                largest = array[i];
+            }
+        }
+        return largest;
+    }
     
 }

@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import Link from "next/link";
-import CreateNft from "./CreateItems";
 import { useRouter } from "next/router";
 import { Context } from "./Context";
 import Web3Modal from "web3modal";
@@ -8,10 +7,8 @@ import Web3Modal from "web3modal";
 function Nav({ isAdmin}) {
   const { address, errorInstance, setErrorInstance, setAddress } =
     useContext(Context).state;
-  const [mobileNavIconVisibility, setMobileNavIconVisibility] = useState(false);
-  const [mobileNavVisibility, setMobileNavVisibility] = useState(false);
+  const [mobileNavVisibility, setMobileNavVisibility] = useState(true);
   function toggleNavVisiblity() {
-    setMobileNavIconVisibility(!mobileNavIconVisibility);
     setMobileNavVisibility(!mobileNavVisibility);
   }
 
@@ -58,13 +55,9 @@ function Nav({ isAdmin}) {
             </form>
           </li>
           <li>
-            {isAdmin === true ? (
-              <CreateNft />
-            ) : (
               <Link href="/account">
                 <a className="rounded-button">My Account</a>
               </Link>
-            )}
           </li>
           <li>
             <a className="rounded-button" onClick={connect}>

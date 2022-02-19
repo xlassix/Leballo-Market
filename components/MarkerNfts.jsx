@@ -44,7 +44,7 @@ export default function MarketNfts() {
       Market.abi,
       provider
     );
-    const data = await marketContract.getMarketItems(nftPerPage * page);
+    const data = await marketContract.getSongs(nftPerPage * page);
 
     const items = await Promise.all(
       data.map(async (elem) => {
@@ -56,6 +56,7 @@ export default function MarketNfts() {
         return {
           price,
           tokenId: elem.tokenId.toNumber(),
+          id: elem.itemId.toNumber(),
           seller: elem.seller,
           owner: elem.owner,
           image: meta.data.image,
@@ -83,7 +84,7 @@ export default function MarketNfts() {
       );
       const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
 
-      const transaction = await contract.createMarketItemSale(
+      const transaction = await contract.createSongSale(
         nftAddress,
         nft.tokenId,
         {
@@ -145,8 +146,7 @@ export default function MarketNfts() {
               return (
                 <MarketNftCard
                   onclick={() => {
-                    setCurrentNft(nft),
-                    router.push("/detail");
+                    router.push(`/song/${nft.id}`);
                   }}
                   nft={nft}
                   key={i}
