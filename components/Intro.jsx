@@ -20,7 +20,7 @@ export default function Intro() {
     { id: 2, image: "./img/Asset 1.png" },
   ]);
   async function loadNfts() {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.rpc);
+    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.matic.today");
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftMarketPlaceAddress,
