@@ -64,8 +64,9 @@ export default function MyNftCard({ nft, onClickFunc, cancel }) {
                 <div className="center">
                   <a
                     onClick={async () => {
-                      setLoading(true);
+                      setLoading(false);
                       await onClickFunc(sellingPrice);
+                      setLoading(true);
                     }}
                     className="rounded-button"
                   >

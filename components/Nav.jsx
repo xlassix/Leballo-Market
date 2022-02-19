@@ -7,10 +7,8 @@ import Web3Modal from "web3modal";
 function Nav({ isAdmin}) {
   const { address, errorInstance, setErrorInstance, setAddress } =
     useContext(Context).state;
-  const [mobileNavIconVisibility, setMobileNavIconVisibility] = useState(false);
-  const [mobileNavVisibility, setMobileNavVisibility] = useState(false);
+  const [mobileNavVisibility, setMobileNavVisibility] = useState(true);
   function toggleNavVisiblity() {
-    setMobileNavIconVisibility(!mobileNavIconVisibility);
     setMobileNavVisibility(!mobileNavVisibility);
   }
 
