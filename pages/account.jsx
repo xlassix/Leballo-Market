@@ -1,6 +1,6 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-import Profile from "../components/profile";
+import Profile from "../components/Profile";
 import dynamic from "next/dynamic";
 import "../styles/upload.module.css";
 import MyNfts from "../components/MyNfts";
