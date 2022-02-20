@@ -829,7 +829,7 @@ figcaption {
   gap:1.5rem;
   justify-content: center;
 }
-.actions>svg{
+.actions svg{
   transform: scale(2);
 }
 #more-intro svg{
@@ -1320,6 +1320,10 @@ ul.flex > li:first-child {
   min-width: calc(100% - 2rem);
   margin: 0.5rem 1rem;
 }
+.actions p{
+  margin: 0;
+}
+
 .upload > a {
   display: block;
   margin-bottom: 2rem;

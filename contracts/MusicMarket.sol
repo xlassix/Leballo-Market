@@ -3,9 +3,9 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
+import "./Helper.sol";
 
-contract MusicMarket is ReentrancyGuard {
+contract MusicMarket is ReentrancyGuard,Helper {
     using Counters for Counters.Counter;
     Counters.Counter private _songCount;
     Counters.Counter private _musicMarketCount;
@@ -14,11 +14,13 @@ contract MusicMarket is ReentrancyGuard {
     Counters.Counter private _currentListings;
     address payable public owner;
     uint256 private listingPrice = 0.025 ether;
+    
 
     //Defined Enums
     enum SongStatus {
         Active,
         Sold,
+        OnBid,
         Reserved
     }
     enum AlbumStatus {
@@ -136,33 +138,28 @@ contract MusicMarket is ReentrancyGuard {
     function setListingPrice(uint256 price)
         external
         onlyOwner
-        returns (uint256)
     {
-        require(owner == msg.sender, "Only the Owner Can set Listing Price");
+        require(owner == msg.sender, "Not Owner");
         listingPrice = price;
-        return listingPrice;
     }
 
     function createArtist(string memory artistName, string memory uri)
         external
         onlyOwner
-        returns (uint256 artistID)
     {
-        require(bytes(uri).length != 0, "URI cant be null or empty");
+        require(bytes(uri).length != 0, "Invalid URI");
         _artistCount.increment();
-        uint256 currentArtistId = _artistCount.current();
-        artists[currentArtistId] = Artist(currentArtistId, artistName, uri);
-        emit ArtistEvent(currentArtistId, artistName, uri, "Artist Created");
-        return currentArtistId;
+        artists[_artistCount.current()] = Artist(_artistCount.current(), artistName, uri);
+        emit ArtistEvent(_artistCount.current(), artistName, uri, "Artist Created");
     }
 
     function createAlbum(
         string memory albumName,
         string memory uri,
         uint256[] memory _artists
-    ) external onlyOwner returns (uint256 albumId) {
-        require(bytes(uri).length != 0, "URI cant be null or empty");
-        require(_artists.length != 0, "At least include a length");
+    ) external onlyOwner {
+        require(bytes(uri).length != 0, "Invalid URI");
+        require(_artists.length != 0);
         // require(
         //     _artists.getMax() <= _artistCount.current(),
         //     "The array artists contains an Invalid Id"
@@ -190,7 +187,6 @@ contract MusicMarket is ReentrancyGuard {
             0,
             "Created Album"
         );
-        return currentAlbumId;
     }
 
     function createSong(
@@ -200,7 +196,7 @@ contract MusicMarket is ReentrancyGuard {
         uint256 artistId,
         uint256 price
     ) external onlyOwner nonReentrant {
-        require(price > 0, "Item Price most be greater then 1 WEI");
+        require(price > 0);
         require(tokenId >= _songCount.current(), "invalid TokenId");
         require(albumId <= _albumCount.current(), "Invalid AlbumId");
 
@@ -240,7 +236,6 @@ contract MusicMarket is ReentrancyGuard {
         public
         payable
         nonReentrant
-        returns (Song memory)
     {
         Song memory item = getItemByTokenId(tokenId);
         require(
@@ -271,14 +266,12 @@ contract MusicMarket is ReentrancyGuard {
             SongStatus.Sold,
             "Sold MusicNFT"
         );
-        return itemIdToSong[item.itemId];
     }
 
     function createSongSale(address musicContract, uint256 itemId)
         public
         payable
         nonReentrant
-        returns (Song memory)
     {
         Song memory currentToken = itemIdToSong[itemId];
         uint256 price = currentToken.price;
@@ -305,7 +298,6 @@ contract MusicMarket is ReentrancyGuard {
             SongStatus.Sold,
             "Transferred MusicNFT"
         );
-        return currentToken;
     }
 
     function listItem(
@@ -317,13 +309,13 @@ contract MusicMarket is ReentrancyGuard {
         uint256 tokenId = currentToken.tokenId;
         require(
             payable(msg.sender) == payable(currentToken.owner),
-            "you must must be the owner"
+            "not owner"
         );
         require(
             currentToken.status != SongStatus.Active,
-            "Cant list that is already Listed"
+            "already Listed"
         );
-        require(msg.value >= listingPrice, "kindly transfer the listed price");
+        require(msg.value >= listingPrice, "Insufficent LP");
         currentToken.price = price;
         currentToken.status = SongStatus.Active;
         _currentListings.increment();
@@ -351,11 +343,11 @@ contract MusicMarket is ReentrancyGuard {
         uint256 tokenId = currentToken.tokenId;
         require(
             payable(msg.sender) == payable(currentToken.owner),
-            "you must must be the owner"
+            "not owner"
         );
         require(
             currentToken.status == SongStatus.Active,
-            "Cant list that is already unListed"
+            "already unListed"
         );
         currentToken.status = SongStatus.Sold;
         _currentListings.decrement();
@@ -370,7 +362,7 @@ contract MusicMarket is ReentrancyGuard {
             currentToken.trackNumber,
             currentToken.artistId,
             SongStatus.Active,
-            "List MusicNFT"
+            "unList MusicNFT"
         );
     }
 
@@ -385,7 +377,7 @@ contract MusicMarket is ReentrancyGuard {
                 return itemIdToSong[index + 1];
             }
         }
-        require(false, "Invalid Token ID");
+        require(false, "Invalid Token");
     }
 
     function getAlbum(uint256 albumId)
@@ -411,7 +403,7 @@ contract MusicMarket is ReentrancyGuard {
             _currentListings.current() -
             _musicMarketCount.current();
         uint256 currentIndex = 0;
-        uint256 _min = Math.min(limit, unsoldItemCount);
+        uint256 _min = min(limit, unsoldItemCount);
 
         Song[] memory unsoldItem = new Song[](_min);
 
@@ -434,7 +426,7 @@ contract MusicMarket is ReentrancyGuard {
             _currentListings.current() -
             _musicMarketCount.current();
         uint256 currentIndex = 0;
-        uint256 _min = Math.min(limit, unsoldItemCount);
+        uint256 _min = min(limit, unsoldItemCount);
         Song[] memory unsoldItem = new Song[](_min);
         for (uint256 index = 0; index < itemCount; index++) {
             if (currentIndex == _min) {
@@ -460,7 +452,7 @@ contract MusicMarket is ReentrancyGuard {
         if (musicOwned == 0) {
             return new Song[](0);
         }
-        uint256 _min = Math.min(limit, musicOwned);
+        uint256 _min = min(limit, musicOwned);
         Song[] memory myMusicNFTs = new Song[](_min);
         for (uint256 index = 0; index < _itemsCount; index++) {
             if (currentIndexOfMusicNFTFound == _min) {

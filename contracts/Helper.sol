@@ -1,29 +1,32 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-library Helper {
+contract Helper {
 
-    function getMax(uint[] storage self) public view returns (uint) {
-        uint largest = 0;
-        for (uint i = 0; i < self.length; i++) {
-            if (self[i] > largest) {
-                largest = self[i];
+    function getMax(uint256[] memory data) public pure returns (uint256) {
+        uint256 largest = 0;
+        for (uint256 i = 0; i < data.length; i++) {
+            if (data[i] > largest) {
+                largest = data[i];
             }
         }
         return largest;
     }
 
-    function checkIfExist(uint256[] storage self, uint256 value)
+    function checkIfExist(uint256[] memory data, uint256 value)
         public
-        view
+        pure
         returns (bool)
     {
-        for (uint256 i = 0; i < self.length; i++) {
-            if (self[i] == value) {
+        for (uint256 i = 0; i < data.length; i++) {
+            if (data[i] == value) {
                 return true;
             }
         }
         return false;
     }
 
+    function min(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a < b ? a : b;
+    }
 }

@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { Context } from "./Context";
 
 export default function Profile({ artists, albums }) {
-  const {address,ownerAddress}=useContext(Context).state;
+  const { address, ownerAddress } = useContext(Context).state;
   return (
     <>
       <section>
@@ -15,37 +15,25 @@ export default function Profile({ artists, albums }) {
         </div>
       </section>
       <section id="profile">
-      {console.log(address,ownerAddress,address===ownerAddress)}
+        {console.log(address, ownerAddress, address === ownerAddress)}
         <div className="details">
           <h2>Artist Name</h2>
-          {address===ownerAddress?
-          <div className="actions">
-            <CreateAlbum options={artists} />
-            <svg
-              xmlSpace="preserve"
-              style={{ fillColor: "white" }}
-              viewBox="0 0 150 150"
-            >
-              <path
-                d="M71.21 6.91a64.3 64.3 0 1 1 -64.3 64.3 64.37 64.37 0 0 1 64.3 -64.3m0 -6.91a71.21 71.21 0 1 0 71.21 71.21A71.21 71.21 0 0 0 71.21 0Z"
-                color="white"
-              />
-              <path
-                d="M44.97 71.21A9.06 9.06 0 0 1 26.85 71.21A9.06 9.06 0 0 1 44.97 71.21Z"
-                color="white"
-              />
-              <path
-                d="M80.27 71.21A9.06 9.06 0 0 1 62.15 71.21A9.06 9.06 0 0 1 80.27 71.21Z"
-                color="white"
-              />
-              <path
-                d="M115.57 71.21A9.06 9.06 0 0 1 97.45 71.21A9.06 9.06 0 0 1 115.57 71.21Z"
-                color="white"
-              />
-            </svg>
-            <CreateArtist />
-            <CreateSong />
-          </div>:null}
+          {address === ownerAddress ? (
+            <div className="actions">
+              <div>
+                <CreateAlbum options={artists} />
+                <p>Create Album</p>
+              </div>
+              <div>
+                <CreateArtist />
+                <p>Create Artist</p>
+              </div>
+              <div>
+                <CreateSong />
+                <p>Create Song</p>
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="line">
           <form>
