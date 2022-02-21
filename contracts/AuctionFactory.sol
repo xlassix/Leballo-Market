@@ -2,6 +2,14 @@
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
 
+interface IMusicMarketPlace {
+    function musicTransfer(
+        address nftAddress,
+        address to,
+        uint256 tokenId
+    ) external;
+}
+
 contract AuctionFactory {
     event bidEvent(
         uint256 indexed auctionId,
@@ -15,7 +23,8 @@ contract AuctionFactory {
         address indexed withdrawer
     );
 
-    address public contactAddress;
+    address contactAddress;
+    address nftMarket;
     using Counters for Counters.Counter;
     Counters.Counter private _openAuctionCount;
     Counters.Counter private _auctionCount;
@@ -42,15 +51,16 @@ contract AuctionFactory {
     mapping(uint256 => AuctionStatus) tokenIdToStatus;
     mapping(uint256 => Auction) public Auctions;
 
-    constructor(address _contactAddress) {
+    constructor(address _contactAddress, address nft) {
         contactAddress = _contactAddress;
+        nftMarket = nft;
     }
 
     /**
      * @dev Throws if called by any contract other than the owner.
      */
     modifier restricted() {
-        require(contactAddress == msg.sender, "not owner");
+        require(msg.sender == address(contactAddress), "not owner");
         _;
     }
 
@@ -128,10 +138,35 @@ contract AuctionFactory {
             createUniqueBidEntry(msg.sender, auctionId)
         ];
         bids[createUniqueBidEntry(msg.sender, auctionId)] = 0;
-        (bool sent, bytes memory data) = Auctions[auctionId].seller.call{
+        (bool sent,) = payable(msg.sender).call{
             value: auctionBalance
         }("");
         assert(sent);
         emit withdrawEvent(auctionId, auctionBalance, msg.sender);
+    }
+
+    function closeAuction(uint256 auctionId) external {
+        require(
+            Auctions[auctionId].endAt < block.timestamp &&
+                Auctions[auctionId].status == AuctionStatus.Started
+        );
+
+        if (Auctions[auctionId].highestBidder != address(0)) {
+            IMusicMarketPlace(contactAddress).musicTransfer(
+                nftMarket,
+                Auctions[auctionId].highestBidder,
+                Auctions[auctionId].tokenId
+            );
+            (bool sent,) = Auctions[auctionId].seller.call{
+                value: Auctions[auctionId].currentBid
+            }("");
+            assert(sent);
+        } else {
+            IMusicMarketPlace(contactAddress).musicTransfer(
+                nftMarket,
+                Auctions[auctionId].seller,
+                Auctions[auctionId].tokenId
+            );
+        }
     }
 }
