@@ -46,3 +46,6 @@ cache
 artifacts/build-info
 *.dbg.json
 artifacts/contracts/bid.sol/IERC721.json
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
