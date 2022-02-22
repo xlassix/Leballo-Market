@@ -254,13 +254,16 @@ contract MusicMarket is ReentrancyGuard {
         );
     }
 
+    /**
+     * @dev transfer Nfts
+     */
     function musicTransfer(
         address nftAddress,
         address to,
         uint256 tokenId
     ) public {
         Song storage item = itemIdToSong[getItemByTokenId(tokenId).itemId];
-        require(msg.sender == item.owner || msg.sender == address(this));
+        require(msg.sender == item.owner );
         IERC721(nftAddress).transferFrom(item.owner, to, tokenId);
         ownerToNftCount[item.owner]--;
         ownerToNftCount[to]++;
@@ -268,6 +271,10 @@ contract MusicMarket is ReentrancyGuard {
         item.owner = payable(to);
     }
 
+
+    /**
+     * @dev Buy Nfts
+     */
     function BuySong(address musicContract, uint256 tokenId)
         public
         payable

@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { pick } from "underscore";
 import axios from "axios";
 
-const rpc=process.env.rpc
+const rpc="https://rpc-mumbai.maticvigil.com"
 
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
