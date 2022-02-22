@@ -3,7 +3,6 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./Helper.sol";
 
 interface IAuctionFactory{
     function createAuction(
@@ -12,10 +11,10 @@ interface IAuctionFactory{
         address seller,
         uint256 startBidPrice,
         uint256 tokenId
-    ) external;
+    ) external returns (uint);
 }
 
-contract MusicMarket is ReentrancyGuard, Helper {
+contract MusicMarket is ReentrancyGuard{
     using Counters for Counters.Counter;
     Counters.Counter private _songCount;
     Counters.Counter private _musicMarketCount;
@@ -86,7 +85,6 @@ contract MusicMarket is ReentrancyGuard, Helper {
         SongStatus status,
         string message
     );
-
     event AlbumEvent(
         uint256 indexed albumId,
         string albumName,
@@ -96,6 +94,15 @@ contract MusicMarket is ReentrancyGuard, Helper {
         uint256 mintedSongs,
         uint256 soldSongs,
         string message
+    );
+    event BidEvent(
+        uint256 indexed auctionId,
+        uint256 indexed tokenId,
+        address auctionMarket,
+        address nftAddress,
+        uint startAt, 
+        uint endAt, 
+        uint startBidPrice
     );
 
     event ArtistEvent(
@@ -116,7 +123,7 @@ contract MusicMarket is ReentrancyGuard, Helper {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyOwner() {
-        require(address(owner) == msg.sender, "Caller must be the owner");
+        require(address(owner) == msg.sender, "not owner");
         _;
     }
 
@@ -328,7 +335,8 @@ contract MusicMarket is ReentrancyGuard, Helper {
         require(msg.sender==_song.owner,"Not Owner");
         musicTransfer(nftAddress, auctionMarket, tokenId);
         _song.status=SongStatus.OnBid;
-        IAuctionFactory(auctionMarket).createAuction(startAt, endAt, msg.sender, startBidPrice, tokenId);
+        uint auctionId=IAuctionFactory(auctionMarket).createAuction(startAt, endAt, msg.sender, startBidPrice, tokenId);
+        emit BidEvent(auctionId, tokenId, auctionMarket, nftAddress, startAt, endAt, startBidPrice);
     }
 
 
@@ -429,8 +437,7 @@ contract MusicMarket is ReentrancyGuard, Helper {
             _currentListings.current() -
             _musicMarketCount.current();
         uint256 currentIndex = 0;
-        uint256 _min = min(limit, unsoldItemCount);
-
+        uint256 _min = limit < unsoldItemCount ? limit : unsoldItemCount; 
         Song[] memory unsoldItem = new Song[](_min);
 
         for (uint256 index = itemCount; index > 0; index--) {
@@ -447,14 +454,13 @@ contract MusicMarket is ReentrancyGuard, Helper {
     }
 
     function getSongs(uint256 limit) public view returns (Song[] memory) {
-        uint256 itemCount = _songCount.current();
-        uint256 unsoldItemCount = itemCount +
+        uint256 unsoldItemCount = _songCount.current() +
             _currentListings.current() -
             _musicMarketCount.current();
         uint256 currentIndex = 0;
-        uint256 _min = min(limit, unsoldItemCount);
+        uint256 _min = limit < unsoldItemCount ? limit : unsoldItemCount;
         Song[] memory unsoldItem = new Song[](_min);
-        for (uint256 index = 0; index < itemCount; index++) {
+        for (uint256 index = 0; index < _songCount.current(); index++) {
             if (currentIndex == _min) {
                 break;
             }
@@ -472,15 +478,13 @@ contract MusicMarket is ReentrancyGuard, Helper {
         view
         returns (Song[] memory)
     {
-        uint256 _itemsCount = _songCount.current();
-        uint256 musicOwned = ownerToNftCount[msg.sender];
         uint256 currentIndexOfMusicNFTFound = 0;
-        if (musicOwned == 0) {
+        if (ownerToNftCount[msg.sender] == 0) {
             return new Song[](0);
         }
-        uint256 _min = min(limit, musicOwned);
+        uint256 _min = limit < ownerToNftCount[msg.sender] ? limit : ownerToNftCount[msg.sender];
         Song[] memory myMusicNFTs = new Song[](_min);
-        for (uint256 index = 0; index < _itemsCount; index++) {
+        for (uint256 index = 0; index < _songCount.current(); index++) {
             if (currentIndexOfMusicNFTFound == _min) {
                 break;
             }

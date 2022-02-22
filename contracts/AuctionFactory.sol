@@ -49,7 +49,7 @@ contract AuctionFactory {
 
     mapping(string => uint256) bids;
     mapping(uint256 => AuctionStatus) tokenIdToStatus;
-    mapping(uint256 => Auction) public Auctions;
+    mapping(uint256 => Auction) public auctions;
 
     constructor(address _contactAddress, address nft) {
         contactAddress = _contactAddress;
@@ -60,7 +60,7 @@ contract AuctionFactory {
      * @dev Throws if called by any contract other than the owner.
      */
     modifier restricted() {
-        require(msg.sender == address(contactAddress), "not owner");
+        require(msg.sender == address(contactAddress), "not Allowed");
         _;
     }
 
@@ -81,13 +81,13 @@ contract AuctionFactory {
         address seller,
         uint256 startBidPrice,
         uint256 tokenId
-    ) external restricted {
+    ) external restricted returns (uint){
         require(
             tokenIdToStatus[tokenId] == AuctionStatus.Closed,
             "Cant Create New Auction while another is Pending"
         );
         _auctionCount.increment();
-        Auctions[_auctionCount.current()] = Auction({
+        auctions[_auctionCount.current()] = Auction({
             id: _auctionCount.current(),
             startAt: startAt,
             endAt: endAt,
@@ -98,38 +98,39 @@ contract AuctionFactory {
             status: AuctionStatus.Reserved
         });
         tokenIdToStatus[tokenId] = AuctionStatus.Reserved;
+        return auctions[_auctionCount.current()].id;
     }
 
-    function bid(uint256 auctionId) external payable {
+    function makeBid(uint256 auctionId) external payable {
         require(
-            Auctions[auctionId].startAt <= block.timestamp &&
-                Auctions[auctionId].endAt >= block.timestamp,
+            auctions[auctionId].startAt <= block.timestamp &&
+                auctions[auctionId].endAt >= block.timestamp,
             "Auction Duration Exceeded"
         );
-        require(msg.value > Auctions[auctionId].currentBid);
-        require(Auctions[auctionId].status != AuctionStatus.Cancelled);
+        require(msg.value > auctions[auctionId].currentBid,"bid must exceed current bid");
+        require(auctions[auctionId].status != AuctionStatus.Cancelled,"Cancelled Auction");
 
-        if (Auctions[auctionId].highestBidder != address(0)) {
+        if (auctions[auctionId].highestBidder != address(0)) {
             bids[
                 createUniqueBidEntry(
-                    Auctions[auctionId].highestBidder,
+                    auctions[auctionId].highestBidder,
                     auctionId
                 )
-            ] += Auctions[auctionId].currentBid;
+            ] += auctions[auctionId].currentBid;
         } else {
-            Auctions[auctionId].status = AuctionStatus.Started;
-            tokenIdToStatus[Auctions[auctionId].tokenId] = AuctionStatus
+            auctions[auctionId].status = AuctionStatus.Started;
+            tokenIdToStatus[auctions[auctionId].tokenId] = AuctionStatus
                 .Started;
         }
 
-        Auctions[auctionId].highestBidder = msg.sender;
-        Auctions[auctionId].currentBid = msg.value;
+        auctions[auctionId].highestBidder = msg.sender;
+        auctions[auctionId].currentBid = msg.value;
 
         emit bidEvent(
             auctionId,
-            Auctions[auctionId].tokenId,
-            Auctions[auctionId].currentBid,
-            Auctions[auctionId].highestBidder
+            auctions[auctionId].tokenId,
+            auctions[auctionId].currentBid,
+            auctions[auctionId].highestBidder
         );
     }
 
@@ -147,25 +148,25 @@ contract AuctionFactory {
 
     function closeAuction(uint256 auctionId) external {
         require(
-            Auctions[auctionId].endAt < block.timestamp &&
-                Auctions[auctionId].status == AuctionStatus.Started
+            auctions[auctionId].endAt < block.timestamp &&
+                auctions[auctionId].status == AuctionStatus.Started,"Auction not yet ended"
         );
 
-        if (Auctions[auctionId].highestBidder != address(0)) {
+        if (auctions[auctionId].highestBidder != address(0)) {
             IMusicMarketPlace(contactAddress).musicTransfer(
                 nftMarket,
-                Auctions[auctionId].highestBidder,
-                Auctions[auctionId].tokenId
+                auctions[auctionId].highestBidder,
+                auctions[auctionId].tokenId
             );
-            (bool sent,) = Auctions[auctionId].seller.call{
-                value: Auctions[auctionId].currentBid
+            (bool sent,) = auctions[auctionId].seller.call{
+                value: auctions[auctionId].currentBid
             }("");
             assert(sent);
         } else {
             IMusicMarketPlace(contactAddress).musicTransfer(
                 nftMarket,
-                Auctions[auctionId].seller,
-                Auctions[auctionId].tokenId
+                auctions[auctionId].seller,
+                auctions[auctionId].tokenId
             );
         }
     }
