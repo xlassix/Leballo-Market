@@ -1,8 +1,9 @@
 import { createContext, useState,useEffect } from "react";
 import Market from "../artifacts/contracts/MusicMarket.sol/MusicMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
+import Auction from "../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json";
 import { create as ipfs_client } from "ipfs-http-client";
-import { nftAddress, nftMarketPlaceAddress } from "../config"
+import { nftAddress, nftMarketPlaceAddress,auctionAddress } from "../config"
 import { getOwner } from "../utils/helper";
 
 //initialize IPFS client
@@ -39,12 +40,14 @@ function Provider(props) {
     client,
     Market,
     NFT,
+    Auction,
     errorInstance,
     setErrorInstance,
     currentNft,
     setCurrentNft,
     nftAddress, 
     nftMarketPlaceAddress,
+    auctionAddress,
     ownerAddress
   };
 

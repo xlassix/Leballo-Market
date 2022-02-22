@@ -127,7 +127,7 @@ describe("Auction Test", async function () {
 
     // tx=await market
     // .connect(buyerAddress)
-    // .createBid(auctionAddress ,nftMarketAddress, new Date().getTime(),  new Date().getTime() + 15*60*1000 , auction_price, 1)
+    // .createAuction(auctionAddress ,nftMarketAddress, new Date().getTime(),  new Date().getTime() + 15*60*1000 , auction_price, 1)
 
     // tx= await  tx.wait()
 
@@ -156,7 +156,7 @@ describe("Auction Test", async function () {
 
     tx = await market
       .connect(buyerAddress)
-      .createBid(
+      .createAuction(
         auctionAddress,
         nftMarketAddress,
         new Date().getTime(),
@@ -184,7 +184,7 @@ describe("Auction Test", async function () {
 
     tx = await market
       .connect(buyerAddress)
-      .createBid(
+      .createAuction(
         auctionAddress,
         nftMarketAddress,
         new Date().getTime(),
@@ -211,7 +211,7 @@ describe("Auction Test", async function () {
 
     tx = await market
       .connect(buyerAddress)
-      .createBid(
+      .createAuction(
         auctionAddress,
         nftMarketAddress,
         parseInt(new Date().getTime() / 1000),
@@ -270,7 +270,7 @@ describe("Auction Test", async function () {
 
     tx = await market
       .connect(buyerAddress)
-      .createBid(
+      .createAuction(
         auctionAddress,
         nftMarketAddress,
         parseInt(new Date().getTime() / 1000),
@@ -325,6 +325,6 @@ describe("Auction Test", async function () {
     console.debug(tx);
 
     tx =await market.getItemByTokenId(createdAuction.tokenId.toString());
-    assert(tx["owner"]).to.equal(seller.address);
+    expect(tx["owner"]).to.equal(seller.address);
   });
 });

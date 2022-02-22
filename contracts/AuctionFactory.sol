@@ -1,8 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-interface IMusicMarketPlace {
+interface IMusicMarketPlace  {
     function musicTransfer(
         address nftAddress,
         address to,
@@ -10,7 +11,7 @@ interface IMusicMarketPlace {
     ) external;
 }
 
-contract AuctionFactory {
+contract AuctionFactory is ReentrancyGuard {
     event bidEvent(
         uint256 indexed auctionId,
         uint256 indexed tokenId,
@@ -81,7 +82,7 @@ contract AuctionFactory {
         address seller,
         uint256 startBidPrice,
         uint256 tokenId
-    ) external restricted returns (uint){
+    ) external restricted nonReentrant returns (uint){
         require(
             tokenIdToStatus[tokenId] == AuctionStatus.Closed,
             "Cant Create New Auction while another is Pending"
@@ -101,7 +102,7 @@ contract AuctionFactory {
         return auctions[_auctionCount.current()].id;
     }
 
-    function makeBid(uint256 auctionId) external payable {
+    function makeBid(uint256 auctionId) external payable nonReentrant {
         require(
             auctions[auctionId].startAt <= block.timestamp &&
                 auctions[auctionId].endAt >= block.timestamp,
@@ -134,7 +135,7 @@ contract AuctionFactory {
         );
     }
 
-    function withdraw(uint256 auctionId) external payable {
+    function withdraw(uint256 auctionId) external payable nonReentrant {
         uint256 auctionBalance = bids[
             createUniqueBidEntry(msg.sender, auctionId)
         ];

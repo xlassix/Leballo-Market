@@ -36,7 +36,7 @@ export default function MarketNfts() {
 
   async function loadNfts() {
     const provider = new ethers.providers.JsonRpcProvider(
-      "https://rpc-mumbai.matic.today"
+      process.env.rpc
     );
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(

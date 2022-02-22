@@ -16,6 +16,8 @@ export default function MyNfts() {
     errorInstance,
     setErrorInstance,
     setAddress,
+    ownerAddress,
+    address,
   } = useContext(Context).state;
   const nftPerPage = 20;
   const [showModal, setModal] = useState();
@@ -24,12 +26,12 @@ export default function MyNfts() {
     setModal(!showModal);
   }
   const router = useRouter();
-  const [nfts, setNfts] = useState([]);
+  const [nfts, setNfts] = useState({ purchased: [], listed: [], Active: [] });
   const [loaded, setLoaded] = useState(true);
 
   useEffect(() => {
     loadNfts();
-  }, []);
+  }, [address]);
 
   async function loadNfts() {
     try {
@@ -43,12 +45,26 @@ export default function MyNfts() {
         Market.abi,
         signer
       );
-      const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
-      const data = await contract.fetchMyMusicNFTs(nftPerPage * page);
-      console.log("fetchMyNft", data);
 
-      const items = await Promise.all(
-        data.map(async (elem) => {
+      const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+
+      var [data, minted] = ([], []);
+      if (address === ownerAddress) {
+        [data, minted] = await Promise.all([
+          contract.fetchMyMusicNFTs(nftPerPage * page),
+          contract.getLastMinted(nftPerPage * page),
+        ]);
+      } else {
+        [data, minted] = await Promise.all([
+          contract.fetchMyMusicNFTs(nftPerPage * page),
+          [],
+        ]);
+      }
+
+      console.log(data, minted);
+
+      const items = await Promise.all([
+        ...data.map(async (elem) => {
           const tokenURI = await tokenContract.tokenURI(elem.tokenId);
           const meta = await axios.get(tokenURI);
           console.log(tokenURI, meta);
@@ -65,10 +81,32 @@ export default function MyNfts() {
             status: elem.status == 0 ? "listed" : "Purchased",
             description: meta.data.description,
           };
-        })
-      );
+        }),
+        ...minted.map(async (elem) => {
+          const tokenURI = await tokenContract.tokenURI(elem.tokenId);
+          const meta = await axios.get(tokenURI);
+          console.log(tokenURI, meta);
+          let price = ethers.utils.formatUnits(elem.price.toString(), "ether");
+
+          return {
+            price,
+            tokenId: elem.tokenId.toNumber(),
+            id: elem.itemId.toNumber(),
+            seller: elem.seller,
+            owner: elem.owner,
+            image: meta.data.image,
+            name: meta.data.name,
+            status: "Active",
+            description: meta.data.description,
+          };
+        }),
+      ]);
       console.log("items", items);
-      setNfts(items);
+      setNfts({
+        purchased: items.filter((elem) => elem.status === "Purchased"),
+        listed: items.filter((elem) => elem.status === "listed"),
+        Active: items.filter((elem) => elem.status === "Active"),
+      });
       setLoaded(true);
     } catch (e) {
       console.log("qeqe", e.message);
@@ -87,7 +125,7 @@ export default function MyNfts() {
       signer
     );
     //list Nfts on Market place
-    let listingPrice = await contract.getListingPrice();
+    let listingPrice = await contract.listingPrice();
     const price = ethers.utils.parseUnits(sell_price, "ether");
     console.log(nftAddress, nft.tokenId, price.toString());
     const transaction = await contract.listItem(
@@ -121,30 +159,84 @@ export default function MyNfts() {
   }
   return (
     <>
-      {nfts.length === 0 && loaded === true ? (
-        <p style={{ textAlign: "center", padding: "7rem 0" }}>
-          No Available Nfts
-        </p>
-      ) : (
-        <section id="my-nfts">
-          {nfts.map((nft, i) => {
-            return (
-              <MyNftCard
-                nft={nft}
-                key={i}
-                cancel={nft.status === "Purchased"}
-                onClickFunc={async (e) => {
-                  if (nft.status === "Purchased") {
-                    await listNft(nft, e);
-                  } else {
-                    await cancelListing(nft);
-                  }
-                }}
-              />
-            );
-          })}
+    {address===ownerAddress?
+      <>
+        <section>
+          <h4>Active ({nfts["Active"].length})</h4>
+          <>
+            {nfts["Active"].length === 0 && loaded === true ? (
+              <p style={{ textAlign: "center", padding: "7rem 0" }}>
+                No Available Nfts
+              </p>
+            ) : (
+              <div className="my-nfts">
+                {nfts["Active"].map((nft, i) => {
+                  return <MyNftCard nft={nft} key={"Active" + i} />;
+                })}
+              </div>
+            )}
+          </>
         </section>
-      )}
+      </>:null
+      }
+      <section>
+        <h4>Purchased ({nfts["purchased"].length})</h4>
+        <>
+          {nfts["purchased"].length === 0 && loaded === true ? (
+            <p style={{ textAlign: "center", padding: "7rem 0" }}>
+              No Available Nfts
+            </p>
+          ) : (
+            <div className="my-nfts">
+              {nfts["purchased"].map((nft, i) => {
+                return (
+                  <MyNftCard
+                    nft={nft}
+                    key={i}
+                    cancel={nft.status === "Purchased"}
+                    onClickFunc={async (e) => {
+                      if (nft.status === "Purchased") {
+                        await listNft(nft, e);
+                      } else {
+                        await cancelListing(nft);
+                      }
+                    }}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </>
+      </section>
+      <section>
+        <h4>listed ({nfts["listed"].length})</h4>
+        <>
+          {nfts["listed"].length === 0 && loaded === true ? (
+            <p style={{ textAlign: "center", padding: "7rem 0" }}>
+              No Available Nfts
+            </p>
+          ) : (
+            <div className="my-nfts">
+              {nfts["listed"].map((nft, i) => {
+                return (
+                  <MyNftCard
+                    nft={nft}
+                    key={i}
+                    cancel={nft.status === "Purchased"}
+                    onClickFunc={async (e) => {
+                      if (nft.status === "Purchased") {
+                        await listNft(nft, e);
+                      } else {
+                        await cancelListing(nft);
+                      }
+                    }}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </>
+      </section>
     </>
   );
 }

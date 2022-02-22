@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { pick } from "underscore";
 import axios from "axios";
 
-const rpc="https://rpc-mumbai.matic.today"
+const rpc=process.env.rpc
 
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
@@ -18,6 +18,7 @@ const songKeys = [
   "trackNumber",
   "artistId",
 ];
+
 
 export async function getAlbums() {
   const provider = new ethers.providers.JsonRpcProvider(rpc);

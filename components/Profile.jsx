@@ -3,6 +3,7 @@ import CreateArtist from "./CreateArtist";
 import CreateAlbum from "./CreateAlbum";
 import { useContext } from "react";
 import { Context } from "./Context";
+import WithdrawBalance from "./WithdrawBalance"
 
 export default function Profile({ artists, albums }) {
   const { address, ownerAddress } = useContext(Context).state;
@@ -23,6 +24,10 @@ export default function Profile({ artists, albums }) {
               <div>
                 <CreateAlbum options={artists} />
                 <p>Create Album</p>
+              </div>
+              <div>
+                <WithdrawBalance />
+                <p>withdraw</p>
               </div>
               <div>
                 <CreateArtist />

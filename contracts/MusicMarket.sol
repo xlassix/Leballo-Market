@@ -4,17 +4,17 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-interface IAuctionFactory{
+interface IAuctionFactory {
     function createAuction(
         uint256 startAt,
         uint256 endAt,
         address seller,
         uint256 startBidPrice,
         uint256 tokenId
-    ) external returns (uint);
+    ) external returns (uint256);
 }
 
-contract MusicMarket is ReentrancyGuard{
+contract MusicMarket is ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _songCount;
     Counters.Counter private _musicMarketCount;
@@ -22,6 +22,7 @@ contract MusicMarket is ReentrancyGuard{
     Counters.Counter private _albumCount;
     Counters.Counter private _currentListings;
     address payable public owner;
+    uint256 private amount;
     uint256 public listingPrice = 0.025 ether;
 
     //Defined Enums
@@ -100,9 +101,9 @@ contract MusicMarket is ReentrancyGuard{
         uint256 indexed tokenId,
         address auctionMarket,
         address nftAddress,
-        uint startAt, 
-        uint endAt, 
-        uint startBidPrice
+        uint256 startAt,
+        uint256 endAt,
+        uint256 startBidPrice
     );
 
     event ArtistEvent(
@@ -137,7 +138,6 @@ contract MusicMarket is ReentrancyGuard{
         }
     }
 
-
     /**
      * @dev get Album
      */
@@ -152,8 +152,13 @@ contract MusicMarket is ReentrancyGuard{
      * @dev set current Listing Price(can only be performed by the Owner)
      */
     function setListingPrice(uint256 price) external onlyOwner {
-        require(owner == msg.sender, "Not Owner");
         listingPrice = price;
+    }
+
+    function withdraw() external onlyOwner {
+        bool sent = owner.send(amount);
+        amount=0;
+        assert(sent);
     }
 
     function createArtist(string memory artistName, string memory uri)
@@ -269,12 +274,9 @@ contract MusicMarket is ReentrancyGuard{
         nonReentrant
     {
         Song memory item = getItemByTokenId(tokenId);
-        require(
-            item.status == SongStatus.Active,
-            "Items not Listed"
-        );
+        require(item.status == SongStatus.Active, "Items not Listed");
         require(msg.value >= item.price, "Insufficent funds");
-        musicTransfer(musicContract,msg.sender , tokenId);
+        musicTransfer(musicContract, msg.sender, tokenId);
         _currentListings.decrement();
         item.owner.transfer(item.price);
         emit SongEvent(
@@ -299,16 +301,16 @@ contract MusicMarket is ReentrancyGuard{
     {
         Song memory currentToken = itemIdToSong[itemId];
         uint256 price = currentToken.price;
-        uint256 tokenId = currentToken.tokenId;
         require(msg.value >= price);
+        uint256 tokenId = currentToken.tokenId;
 
         IERC721(musicContract).transferFrom(address(this), msg.sender, tokenId);
         ownerToNftCount[msg.sender]++;
         currentToken.status = SongStatus.Sold;
         currentToken.owner = payable(msg.sender);
         _musicMarketCount.increment();
-        currentToken.seller.transfer(price);
         itemIdToSong[itemId] = currentToken;
+        amount += price;
         emit SongEvent(
             itemId,
             tokenId,
@@ -324,22 +326,35 @@ contract MusicMarket is ReentrancyGuard{
         );
     }
 
-    function createBid(
+    function createAuction(
         address auctionMarket,
         address nftAddress,
-        uint startAt, 
-        uint endAt, 
-        uint startBidPrice,
-        uint tokenId) external{
+        uint256 startAt,
+        uint256 endAt,
+        uint256 startBidPrice,
+        uint256 tokenId
+    ) external {
         Song storage _song = itemIdToSong[getItemByTokenId(tokenId).itemId];
-        require(msg.sender==_song.owner,"Not Owner");
+        require(msg.sender == _song.owner, "Not Owner");
         musicTransfer(nftAddress, auctionMarket, tokenId);
-        _song.status=SongStatus.OnBid;
-        uint auctionId=IAuctionFactory(auctionMarket).createAuction(startAt, endAt, msg.sender, startBidPrice, tokenId);
-        emit BidEvent(auctionId, tokenId, auctionMarket, nftAddress, startAt, endAt, startBidPrice);
+        _song.status = SongStatus.OnBid;
+        uint256 auctionId = IAuctionFactory(auctionMarket).createAuction(
+            startAt,
+            endAt,
+            msg.sender,
+            startBidPrice,
+            tokenId
+        );
+        emit BidEvent(
+            auctionId,
+            tokenId,
+            auctionMarket,
+            nftAddress,
+            startAt,
+            endAt,
+            startBidPrice
+        );
     }
-
-
 
     function listItem(
         address musicContract,
@@ -356,6 +371,7 @@ contract MusicMarket is ReentrancyGuard{
         require(msg.value >= listingPrice, "Insufficent LP");
         currentToken.price = price;
         currentToken.status = SongStatus.Active;
+        amount += listingPrice;
         _currentListings.increment();
         emit SongEvent(
             itemId,
@@ -437,7 +453,7 @@ contract MusicMarket is ReentrancyGuard{
             _currentListings.current() -
             _musicMarketCount.current();
         uint256 currentIndex = 0;
-        uint256 _min = limit < unsoldItemCount ? limit : unsoldItemCount; 
+        uint256 _min = limit < unsoldItemCount ? limit : unsoldItemCount;
         Song[] memory unsoldItem = new Song[](_min);
 
         for (uint256 index = itemCount; index > 0; index--) {
@@ -482,7 +498,9 @@ contract MusicMarket is ReentrancyGuard{
         if (ownerToNftCount[msg.sender] == 0) {
             return new Song[](0);
         }
-        uint256 _min = limit < ownerToNftCount[msg.sender] ? limit : ownerToNftCount[msg.sender];
+        uint256 _min = limit < ownerToNftCount[msg.sender]
+            ? limit
+            : ownerToNftCount[msg.sender];
         Song[] memory myMusicNFTs = new Song[](_min);
         for (uint256 index = 0; index < _songCount.current(); index++) {
             if (currentIndexOfMusicNFTFound == _min) {
