@@ -35,7 +35,6 @@ export default function MyNftCard({ nft, onClickFunc, cancel }) {
               <p>96</p>
             </div>
           </div>
-          <p>{nft.status}</p>
         </figcaption>
       </figure>
       {showModal ? (
@@ -57,7 +56,7 @@ export default function MyNftCard({ nft, onClickFunc, cancel }) {
                     onChange={(e) => setSellingPrice(e.target.value)}
                   />
                 ) : (
-                  <p style={{ textAlign: "center", padding: "7rem 0" }}>
+                  <p style={{ textAlign: "center", padding: "5rem" }}>
                     Proceed to cancel Listing
                   </p>
                 )}
@@ -77,7 +76,7 @@ export default function MyNftCard({ nft, onClickFunc, cancel }) {
                 </div>
               </>
             ) : (
-              <p style={{ textAlign: "center", padding: "7rem 0" }}>
+              <p style={{ textAlign: "center", padding: "5rem" }}>
                 Processing...
               </p>
             )}

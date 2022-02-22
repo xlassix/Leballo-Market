@@ -41,8 +41,9 @@ export default function BuySong({ nft }) {
       const price = ethers.utils.parseUnits(nft.formatted_price, "ether");
       console.log(nft.formatted_price, price, nft.itemId, price.toString());
 
+      var transaction
       if (nft.owner == "0x0000000000000000000000000000000000000000") {
-        const transaction = await contract.createSongSale(
+        transaction = await contract.createSongSale(
           nftAddress,
           nft.itemId.toNumber(),
           {
@@ -50,7 +51,7 @@ export default function BuySong({ nft }) {
           }
         );
       }else{
-        const transaction = await contract.BuySong(
+        transaction = await contract.BuySong(
             nftAddress,
             nft.tokenId.toNumber(),
             {

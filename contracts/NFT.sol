@@ -20,10 +20,14 @@ contract NFT is ERC721URIStorage{
         address to,
         uint256 tokenId
     ) public virtual override {
-        //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(from, tokenId), "ERC721: transfer caller is not owner nor approved");
 
         _transfer(from, to, tokenId);
+    }
+
+    function burn(uint256 tokenId) public {
+        require(_isApprovedOrOwner(msg.sender, tokenId), "ERC721: transfer caller is not owner nor approved");
+        _burn(tokenId);
     }
 
     function createToken(string memory uri) external returns (uint256){

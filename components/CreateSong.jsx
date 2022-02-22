@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { useState, useEffect, useContext } from "react";
+import { useRouter } from "next/router";
 import Modal from "./Modal";
 import Web3Modal from "web3modal";
 import { Context } from "./Context";
@@ -9,6 +10,7 @@ import makeAnimated from "react-select/animated";
 const animatedComponents = makeAnimated();
 
 export default function CreateSong() {
+  const router =useRouter();
   const {
     client,
     nftAddress,
@@ -22,9 +24,9 @@ export default function CreateSong() {
 
   const [albums, setAlbums] = useState([]);
   const [artist, setArtists] = useState([]);
-  const [showModal, setModal] = useState();
+  const [showModal, setModal] = useState(false);
   const [_album, setAlbum] = useState();
-  const [_artist, setArtist] = useState({"value":null});
+  const [_artist, setArtist] = useState({ value: null });
   const [uploaded, setIsUploaded] = useState(true);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -49,10 +51,10 @@ export default function CreateSong() {
     }
     if (_album) {
       const _albums = await getAlbum(_album.value);
-      setArtist({"value":null})
+      setArtist({ value: null });
       setArtists(
         _albums["_artists"].map((elem) => {
-          return { "value": elem.id.toString(), "label": elem.artistName };
+          return { value: elem.id.toString(), label: elem.artistName };
         })
       );
     }
@@ -93,21 +95,19 @@ export default function CreateSong() {
 
   async function createItem() {
     const { name, description, price } = formData;
-    const data = JSON.stringify({ 
-      name, 
-      price, 
-      description, 
+    const data = JSON.stringify({
+      name,
+      price,
+      description,
       image: fileUrl,
       album: _album.label,
       artist: _artist.label,
     });
     console.log(data);
-    try {
-      const _added = await client.add(data);
-      createSales(`https://ipfs.infura.io/ipfs/${_added.path}`);
-    } catch (e) {
-      console.log(e.message.__proto__);
-    }
+    const _added = await client.add(data);
+    var id = await createSales(`https://ipfs.infura.io/ipfs/${_added.path}`);
+    router.push(`/song/${id}`)
+    setModal(false);
   }
 
   async function createSales(url) {
@@ -134,10 +134,10 @@ export default function CreateSong() {
         tokenId,
         parseInt(_album.value),
         parseInt(_artist.value),
-        price,
+        price
       );
       tx = await transaction.wait();
-      return tx.events[0]["transactionHash"];
+      return tx.events[2].args["itemId"].toString();
     } catch (e) {
       console.log(e);
       setErrorInstance({
@@ -239,7 +239,9 @@ export default function CreateSong() {
                       !(progress == 1.0) ||
                       formData.description.length == 0 ||
                       !/^\d+$|(\d+[.]\d+)$/.test(formData.price) ||
-                      formData.name.length == 0 || _artist == null || _album.value ==null
+                      formData.name.length == 0 ||
+                      _artist == null ||
+                      _album.value == null
                     }
                   >
                     Create Nft

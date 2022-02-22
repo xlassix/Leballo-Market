@@ -829,7 +829,7 @@ figcaption {
   gap:1.5rem;
   justify-content: center;
 }
-.actions>svg{
+.actions svg{
   transform: scale(2);
 }
 #more-intro svg{
@@ -1193,13 +1193,14 @@ ul.flex > li:first-child {
 #profile .line p {
   margin: 0.75rem 1rem 0.75rem 0;
 }
-#my-nfts {
+
+.my-nfts {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   grid-gap: 1rem;
 }
-#my-nfts figure {
+.my-nfts figure {
   background-color: #2b2d3a;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -1207,20 +1208,20 @@ ul.flex > li:first-child {
   font-weight: 600;
   margin: 0;
 }
-#my-nfts figure h5 {
+.my-nfts figure h5 {
   padding: 0;
   margin: 0;
   font-weight: 600;
   font-size: 105%;
 }
-#my-nfts figure img {
+.my-nfts figure img {
   border-radius: 1rem;
   height: 15rem;
 }
-#my-nfts figure figcaption {
+.my-nfts figure figcaption {
   padding: 1rem 1rem 0 1rem;
 }
-#my-nfts figure .flex-center {
+.my-nfts figure .flex-center {
   justify-content: space-between;
   font-weight: 500;
 }
@@ -1320,6 +1321,10 @@ ul.flex > li:first-child {
   min-width: calc(100% - 2rem);
   margin: 0.5rem 1rem;
 }
+.actions p{
+  margin: 0;
+}
+
 .upload > a {
   display: block;
   margin-bottom: 2rem;
@@ -1377,7 +1382,7 @@ ul.flex > li:first-child {
   }
   #nfts,
   footer,
-  #my-nfts {
+  .my-nfts {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
@@ -1453,10 +1458,10 @@ ul.flex > li:first-child {
     grid-template-columns: 1fr;
   }
 
-  #my-nfts {
+  .my-nfts {
     grid-template-columns: 1fr;
   }
-  #my-nfts figure img {
+  .my-nfts figure img {
     border-radius: 1rem;
     height: 20rem;
   }

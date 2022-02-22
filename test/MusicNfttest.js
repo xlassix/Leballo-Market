@@ -173,7 +173,7 @@ describe("MusicNft market", async function () {
       eminemData["artistId"].toString(),
       nfData["artistId"].toString(),
     ]);
-    let listingPrice = await market.getListingPrice();
+    let listingPrice = await market.listingPrice();
     listingPrice = listingPrice.toString();
 
     tx = await market.createSong(
