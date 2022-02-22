@@ -45,3 +45,4 @@ cache
 .firebase
 artifacts/build-info
 *.dbg.json
+artifacts/contracts/bid.sol/IERC721.json
