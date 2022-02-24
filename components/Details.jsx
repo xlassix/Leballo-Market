@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { Context } from "./Context";
 import { getSong, getAlbum } from "../utils/helper";
 import BuySong from "./BuySong";
+import MakeBid from "./makeBid";
 
 export default function DetailNft({ id }) {
   const { address, setErrorInstance, errorInstance } = useContext(Context).state;
@@ -26,10 +27,8 @@ export default function DetailNft({ id }) {
 
   return (
     <>
-      {console.log(nft)}
       {loaded ? (
         <section className="flex">
-          {console.log(nft)}
           <img src={nft.meta.image} />
           <div className="nft-detail">
             <div className="title">
@@ -81,6 +80,12 @@ export default function DetailNft({ id }) {
                 <>
                   <BuySong nft={nft} />
                   {/* <a className="rounded-button btn-border">Place Order</a> */}
+                </>
+              ) : null}
+              {
+              (nft.status == 2 && nft.owner != address) ? (
+                <>
+                <MakeBid itemId={id} />
                 </>
               ) : null}
             </div>

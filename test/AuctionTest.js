@@ -167,7 +167,7 @@ describe("Auction Test", async function () {
 
     tx = await tx.wait();
 
-    var createdAuction = tx.events[2].args;
+    var createdAuction = tx.events[3].args;
 
     var auctionId = createdAuction.auctionId.toString();
 
@@ -195,7 +195,7 @@ describe("Auction Test", async function () {
 
     tx = await tx.wait();
 
-    var createdAuction = tx.events[2].args;
+    var createdAuction = tx.events[3].args;
 
     var auctionId = createdAuction.auctionId.toString();
 
@@ -222,7 +222,7 @@ describe("Auction Test", async function () {
 
     tx = await tx.wait();
 
-    var createdAuction = tx.events[2].args;
+    var createdAuction = tx.events[3].args;
 
     var auctionId = createdAuction.auctionId.toString();
 
@@ -281,7 +281,7 @@ describe("Auction Test", async function () {
 
     tx = await tx.wait();
 
-    var createdAuction = tx.events[2].args;
+    var createdAuction = tx.events[3].args;
 
     var auctionId = createdAuction.auctionId.toString();
 

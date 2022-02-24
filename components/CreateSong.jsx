@@ -10,7 +10,7 @@ import makeAnimated from "react-select/animated";
 const animatedComponents = makeAnimated();
 
 export default function CreateSong() {
-  const router =useRouter();
+  const router = useRouter();
   const {
     client,
     nftAddress,
@@ -40,24 +40,32 @@ export default function CreateSong() {
     description: "",
   });
 
-  useEffect(async () => {
-    if (albums.length == 0) {
-      const _artists = await getAlbums();
-      setAlbums(
-        _artists.map((elem) => {
+  useEffect(() => {
+    async function feedData() {
+      if (albums.length == 0) {
+        console.log("sfs")
+        const _albums = (await getAlbums()).map((elem) => {
           return { value: elem.id.toString(), label: elem.albumName };
-        })
-      );
+        });
+        await setAlbums(
+          _albums
+        );
+        if (_albums.length > 0) {
+          setAlbum(_albums[0]);
+        }
+      }
+      if (albums.length > 0 || _album) {
+        const _albums = await getAlbum(_album ? _album.value : albums[0].value);
+        setArtist({ value: null });
+        setArtists(
+          _albums["_artists"].map((elem) => {
+            return { value: elem.id.toString(), label: elem.artistName };
+          })
+        );
+      }
+      console.log(albums);
     }
-    if (_album) {
-      const _albums = await getAlbum(_album.value);
-      setArtist({ value: null });
-      setArtists(
-        _albums["_artists"].map((elem) => {
-          return { value: elem.id.toString(), label: elem.artistName };
-        })
-      );
-    }
+    feedData();
   }, [showModal, _album]);
 
   async function HandleSubmit(e) {
@@ -82,7 +90,6 @@ export default function CreateSong() {
     try {
       const _added = await client.add(file, {
         progress: (prog) => {
-          console.log(prog, file_size);
           setIsUploaded(prog == file_size);
           setProgress(prog / file_size);
         },
@@ -106,7 +113,7 @@ export default function CreateSong() {
     console.log(data);
     const _added = await client.add(data);
     var id = await createSales(`https://ipfs.infura.io/ipfs/${_added.path}`);
-    router.push(`/song/${id}`)
+    router.push(`/song/${id}`);
     setModal(false);
   }
 
@@ -196,6 +203,8 @@ export default function CreateSong() {
                 isSearchable
                 placeholder="Select Album"
                 options={albums}
+                value={_album}
+                defaultValue={albums[0]}
                 required={true}
                 onChange={setAlbum}
                 noOptionsMessage={({ inputValue: string }) =>
@@ -219,7 +228,7 @@ export default function CreateSong() {
                 type="number"
                 required={true}
                 onChange={(e) =>
-                  setFormData({ ...formData, price: e.target.value })
+                  setFormData({ ...formData, price: parseFloat(e.target.value).toString() })
                 }
               />
               <input
@@ -229,6 +238,7 @@ export default function CreateSong() {
                 required={true}
               />
               <div className="center">
+              {console.log(_album)}
                 {uploaded ? (
                   <button
                     className="rounded-button"
@@ -241,7 +251,8 @@ export default function CreateSong() {
                       !/^\d+$|(\d+[.]\d+)$/.test(formData.price) ||
                       formData.name.length == 0 ||
                       _artist == null ||
-                      _album.value == null
+                      _album == null ||
+                      parseFloat(formData.price) == 0
                     }
                   >
                     Create Nft

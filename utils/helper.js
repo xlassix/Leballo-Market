@@ -1,11 +1,12 @@
 import Market from "../artifacts/contracts/MusicMarket.sol/MusicMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
-import { nftAddress, nftMarketPlaceAddress } from "../config";
+import Auction from "../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json"
+import { nftAddress, nftMarketPlaceAddress, auctionAddress } from "../config";
 import { ethers } from "ethers";
-import { pick } from "underscore";
+import { pick,map,each,reduce } from "underscore";
 import axios from "axios";
 
-const rpc="https://rpc-mumbai.maticvigil.com"
+const rpc="http://localhost:8545/";
 
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
@@ -17,6 +18,14 @@ const songKeys = [
   "status",
   "trackNumber",
   "artistId",
+];
+const AuctionKeys = [
+  "id",
+  "tokenId",
+  "currentBid",
+  "startAt",
+  "endAt",
+  "status"
 ];
 
 
@@ -87,3 +96,19 @@ export async function getMetadata(tokenId) {
   return await axios.get(tokenURI);
 }
 
+export async function getAuctions() {
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
+  const auctionContract = new ethers.Contract(
+    auctionAddress,
+    Auction.abi,
+    provider
+    );
+    const activeAuction= (await auctionContract.getAuctions()).filter(elem=>parseInt(elem.status)!=0)
+    var data = await Promise.all(activeAuction.map(async (elem)=>{
+      const data=pick(elem, AuctionKeys)
+      data.meta= (await getMetadata(elem.tokenId.toString())).data
+      data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
+      return data
+    }));
+  return data
+}
