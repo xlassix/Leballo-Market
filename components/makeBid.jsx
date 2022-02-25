@@ -4,8 +4,10 @@ import Modal from "./Modal";
 import Web3Modal from "web3modal";
 import { useRouter } from "next/router";
 import { Context } from "./Context";
+import { getAuctionByItemID } from "../utils/helper";
 
-export default function MakeBid({ auction,itemId }) {
+export default function MakeBid({ auction, itemId }) {
+  const [_auction, setAuction] = useState(auction ? auction : {});
   const {
     Auction,
     auctionAddress,
@@ -29,12 +31,15 @@ export default function MakeBid({ auction,itemId }) {
     setLoading(false);
     toggleData();
   }
-  useEffect(()=>{
-    if(itemId){
-      
+  useEffect(() => {
+    async function feedData() {
+      if (itemId) {
+        var data = await getAuctionByItemID(itemId);
+        setAuction(data);
+      }
     }
-  }
-  ,[itemId])
+    feedData();
+  }, [itemId]);
 
   async function _bidNfts() {
     try {
@@ -45,14 +50,14 @@ export default function MakeBid({ auction,itemId }) {
 
       const contract = new ethers.Contract(auctionAddress, Auction.abi, signer);
 
-      var transaction = await contract.makeBid(auction.id.toString(), {
+      var transaction = await contract.makeBid(_auction.id.toString(), {
         value: price.toString(),
       });
 
       console.log(transaction);
 
       await transaction.wait();
-      router.push(`/song/${auction.tokenId.toString()}`);
+      router.push(`/song/${_auction.tokenId.toString()}`);
     } catch (e) {
       console.log(e);
       setErrorInstance({
@@ -73,7 +78,7 @@ export default function MakeBid({ auction,itemId }) {
 
       const contract = new ethers.Contract(auctionAddress, Auction.abi, signer);
 
-      var transaction = await contract.closeAuction(auction.id.toString());
+      var transaction = await contract.closeAuction(_auction.id.toString());
 
       console.log(transaction);
 
@@ -95,14 +100,20 @@ export default function MakeBid({ auction,itemId }) {
   }
   return (
     <>
-    {console.log(parseInt(auction.startAt),parseInt(auction.endAt),parseInt(new Date().getTime() / 1000),parseInt(auction.endAt) > parseInt(new Date().getTime() / 1000) ,parseInt(auction.startAt) < parseInt(new Date().getTime() / 1000)  )}
-      {parseInt(auction.endAt) < parseInt(new Date().getTime() / 1000) &&
-      parseInt(auction.status) == 0 ? (
+      {console.log(
+        parseInt(_auction.startAt),
+        parseInt(_auction.endAt),
+        parseInt(new Date().getTime() / 1000),
+        parseInt(_auction.endAt) > parseInt(new Date().getTime() / 1000),
+        parseInt(_auction.startAt) < parseInt(new Date().getTime() / 1000)
+      )}
+      {parseInt(_auction.endAt) < parseInt(new Date().getTime() / 1000) &&
+      parseInt(_auction.status) == 0 ? (
         <button disabled="" className="rounded-button invented-btn">
           Auction Ended
         </button>
-      ) : parseInt(auction.startAt) < parseInt(new Date().getTime() / 1000) &&
-        parseInt(auction.endAt) > parseInt(new Date().getTime() / 1000) ? (
+      ) : parseInt(_auction.startAt) < parseInt(new Date().getTime() / 1000) &&
+        parseInt(new Date().getTime() / 1000) < parseInt(_auction.endAt) ? (
         <a onClick={toggleData} className="rounded-button btn-border">
           Make a bid
         </a>

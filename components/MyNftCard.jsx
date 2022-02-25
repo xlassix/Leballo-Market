@@ -32,9 +32,10 @@ export default function MyNftCard({
         <figcaption>
           <h5>{nft.name}</h5>
           <div className="flex flex-center">
+          {console.log(nft)}
             <p>{nft.price}</p>
             {admin ? (
-              <CreateAuction id={nft.tokenId} />
+              <CreateAuction id={nft.tokenId} itemId={nft.id.toString()} />
             ) : (
               <div className="flex flex-center 9">
                 <svg

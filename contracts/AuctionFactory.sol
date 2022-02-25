@@ -4,8 +4,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 library Music {
-
-  struct Song {
+    struct Song {
         uint256 itemId;
         uint256 tokenId;
         address musicContract;
@@ -15,9 +14,8 @@ library Music {
         uint256 albumId;
         uint256 trackNumber;
         uint256 artistId;
-        uint status;
+        uint256 status;
     }
-
 }
 
 interface IMusicMarketPlace {
@@ -32,10 +30,13 @@ interface IMusicMarketPlace {
         view
         returns (Music.Song memory item);
 
-    function itemIdToSong(uint256 item) external view returns(Music.Song memory);
+    function itemIdToSong(uint256 item)
+        external
+        view
+        returns (Music.Song memory);
 }
 
-contract AuctionFactory is  ReentrancyGuard {
+contract AuctionFactory is ReentrancyGuard {
     event bidEvent(
         uint256 indexed auctionId,
         uint256 indexed tokenId,
@@ -131,7 +132,7 @@ contract AuctionFactory is  ReentrancyGuard {
             highestBidder: address(0),
             status: AuctionStatus.Reserved
         });
-        tokenIdToAuction[tokenId]=_auctionCount.current();
+        tokenIdToAuction[tokenId] = _auctionCount.current();
         emit AuctionEvent(
             auctions[_auctionCount.current()].id,
             tokenId,
@@ -198,9 +199,12 @@ contract AuctionFactory is  ReentrancyGuard {
 
     function closeAuction(uint256 auctionId) external {
         require(
-            auctions[auctionId].endAt < block.timestamp &&
-                auctions[auctionId].status == AuctionStatus.Started,
+            auctions[auctionId].endAt < block.timestamp,
             "Auction not yet ended"
+        );
+        require(
+            auctions[auctionId].status != AuctionStatus.Cancelled,
+            "Cancelled Auction"
         );
 
         if (auctions[auctionId].highestBidder != address(0)) {
@@ -221,6 +225,7 @@ contract AuctionFactory is  ReentrancyGuard {
             );
         }
         _openAuctionCount.decrement();
+        auctions[auctionId].status = AuctionStatus.Closed;
         emit AuctionEvent(
             auctions[auctionId].id,
             auctions[auctionId].tokenId,
@@ -233,18 +238,23 @@ contract AuctionFactory is  ReentrancyGuard {
     /**
      * @dev get Auction
      */
-    function getAuctions() public view returns (Auction [] memory data) {
+    function getAuctions() public view returns (Auction[] memory data) {
         data = new Auction[](_auctionCount.current());
         for (uint256 i = 1; i <= data.length; i++) {
-            data[i-1] = auctions[i];
+            data[i - 1] = auctions[i];
         }
     }
 
     /**
      * @dev get Auction by ItemId
      */
-    function getAuctionByItemId(uint itemId) public view returns (Auction memory data) {
-        Music.Song memory _song = IMusicMarketPlace(contactAddress).itemIdToSong(itemId);
+    function getAuctionByItemId(uint256 itemId)
+        public
+        view
+        returns (Auction memory data)
+    {
+        Music.Song memory _song = IMusicMarketPlace(contactAddress)
+            .itemIdToSong(itemId);
         data = auctions[tokenIdToAuction[_song.tokenId]];
     }
 }

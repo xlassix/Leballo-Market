@@ -86,8 +86,8 @@ export default function Spec() {
           </div>
         </div>
         <div id="list-featured">
-        {console.log(auctions)}
-        {auctions.map((elem,ind)=>{
+        {auctions.length==0?<p style={{margin:"auto"}}>No Active auctions</p> 
+        :auctions.map((elem,ind)=>{
           return(<article key={ind}>
             <img
               className="rounded-corners"

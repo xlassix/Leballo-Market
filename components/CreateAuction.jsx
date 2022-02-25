@@ -5,7 +5,7 @@ import Web3Modal from "web3modal";
 import { Context } from "./Context";
 import { useRouter } from "next/router";
 
-export default function CreateAuction({ id }) {
+export default function CreateAuction({ id ,itemId}) {
   const {
     Auction,
     auctionAddress,
@@ -33,7 +33,7 @@ export default function CreateAuction({ id }) {
     setLoading(true);
     console.log(formData, id);
     await createBid(formData);
-    router.push(`/account`);
+    router.push(`/song/${itemId}`);
   }
 
   async function createBid({ price, startAt, endAt }) {
@@ -158,6 +158,7 @@ export default function CreateAuction({ id }) {
                   disabled={
                     formData.startAt < 1645620886 ||
                     formData.endAt < 1645620886 ||
+                    formData.endAt<=formData.startAt||
                     !/^\d+$|(\d+[.]\d+)$/.test(formData.price) ||
                     parseFloat(formData.price) == 0
                   }

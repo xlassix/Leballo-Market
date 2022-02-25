@@ -5,9 +5,8 @@ import { nftAddress, nftMarketPlaceAddress, auctionAddress } from "../config";
 import { ethers } from "ethers";
 import { pick,map,each,reduce } from "underscore";
 import axios from "axios";
-
-const rpc="http://localhost:8545/";
-
+// const rpc=`https://polygon-mumbai.infura.io/v3/${process.env.project_id}`;
+const rpc="https://rpc-mumbai.maticvigil.com";
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
   "itemId",
@@ -110,5 +109,20 @@ export async function getAuctions() {
       data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
       return data
     }));
+  return data
+}
+
+export async function getAuctionByItemID(id) {
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
+  const auctionContract = new ethers.Contract(
+    auctionAddress,
+    Auction.abi,
+    provider
+    );
+  const auction= (await auctionContract.getAuctionByItemId(id))
+  const data=pick(auction, AuctionKeys)
+  data.meta= (await getMetadata(auction.tokenId.toString())).data
+  data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
+  console.log(data);
   return data
 }

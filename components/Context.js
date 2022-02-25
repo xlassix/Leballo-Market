@@ -17,6 +17,7 @@ const client = ipfs_client({
 });
 
 //Initialize CreateContext
+const rpc="https://rpc-mumbai.maticvigil.com";
 let Context = createContext();
 function Provider(props) {
   //State Defination
@@ -48,7 +49,8 @@ function Provider(props) {
     nftAddress, 
     nftMarketPlaceAddress,
     auctionAddress,
-    ownerAddress
+    ownerAddress,
+    rpc
   };
 
   return (
