@@ -1,6 +1,21 @@
 import ScrollAnimation from "react-animate-on-scroll";
+import { getAuctions } from "../utils/helper";
+import { useEffect,useState } from "react";
+import MakeBid from "./makeBid";
 export default function Spec() {
+
+  const [auctions,setAuctions]= useState([])
+
+  useEffect(()=>{
+    async function feedData(){
+      var data=(await getAuctions())
+      setAuctions(data)
+      console.log("ygyu",data)
+    }
+    feedData();
+  },[])
   return (
+    <>
     <div className="bgcolor_lit_purple">
       <section id="more-intro">
         <h3>THE AMAZING NET ART OF THE WORLD HERE</h3>
@@ -71,13 +86,15 @@ export default function Spec() {
           </div>
         </div>
         <div id="list-featured">
-          <article>
+        {auctions.length==0?<p style={{margin:"auto"}}>No Active auctions</p> 
+        :auctions.map((elem,ind)=>{
+          return(<article key={ind}>
             <img
               className="rounded-corners"
-              src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG"
+              src={elem.meta.image}
             />
             <div className="flex">
-              <h6>The Song Title</h6>
+              <h6>{elem.meta.name}</h6>
               <div className="flex flex-sb">
                 <div
                   className="blank_sq_image"
@@ -90,71 +107,18 @@ export default function Spec() {
                       d="M11.944 17.97L4.58 13.62 11.943 24l7.37 -10.38 -7.372 4.35h0.003zM12.056 0L4.69 12.223l7.365 4.354 7.365 -4.35L12.056 0z"
                     />
                   </svg>
-                  <p>0.25 USD</p>
+                  <p>{elem.formatted_price}</p>
                 </div>
                 <p>1 of 8</p>
               </div>
-              <button disabled={true} className="rounded-button invented-btn">
+              {/* <button disabled={true} className="rounded-button invented-btn">
                 Place a Bid
-              </button>
+              </button> */}
+              <MakeBid auction ={elem} />
             </div>
-          </article>
-          <article>
-            <img
-              className="rounded-corners"
-              src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG"
-            />
-            <div className="flex">
-              <h6>The Song Title</h6>
-              <div className="flex flex-sb">
-                <div
-                  className="blank_sq_image"
-                  style={{ "--length": "3rem", "--radius": "50%" }}
-                ></div>
-                <div className="price">
-                  <svg viewBox="0 0 20px 20px">
-                    <path
-                      style={{ fill: "currentColor" }}
-                      d="M11.944 17.97L4.58 13.62 11.943 24l7.37 -10.38 -7.372 4.35h0.003zM12.056 0L4.69 12.223l7.365 4.354 7.365 -4.35L12.056 0z"
-                    />
-                  </svg>
-                  <p>0.25 USD</p>
-                </div>
-                <p>1 of 8</p>
-              </div>
-              <button disabled={true} className="rounded-button invented-btn">
-                Place a Bid
-              </button>
-            </div>
-          </article>
-          <article>
-            <img
-              className="rounded-corners"
-              src="https://ipfs.infura.io/ipfs/QmbqDinZXs8Sfp67fKNRYYpp92L4Bm9VYu2bWZgodMY3YG"
-            />
-            <div className="flex">
-              <h6>The Song Title</h6>
-              <div className="flex flex-sb">
-                <div
-                  className="blank_sq_image"
-                  style={{ "--length": "3rem", "--radius": "50%" }}
-                ></div>
-                <div className="price">
-                  <svg viewBox="0 0 20px 20px">
-                    <path
-                      style={{ fill: "currentColor" }}
-                      d="M11.944 17.97L4.58 13.62 11.943 24l7.37 -10.38 -7.372 4.35h0.003zM12.056 0L4.69 12.223l7.365 4.354 7.365 -4.35L12.056 0z"
-                    />
-                  </svg>
-                  <p>0.25 USD</p>
-                </div>
-                <p>1 of 8</p>
-              </div>
-              <button disabled={true}  className="rounded-button invented-btn">
-                Place a Bid
-              </button>
-            </div>
-          </article>
+          </article>)
+        })
+        }
         </div>
         <div id="top-collection">
           <h3>TOP COLLECTION OVER</h3>
@@ -278,7 +242,6 @@ export default function Spec() {
         </div>
       </section>
 
-      <ScrollAnimation animateIn="fadeIn">
         <section id="nft-collections">
           <h2>COLLECTION FEATURED NFTS</h2>
           <div id="collections">
@@ -341,7 +304,35 @@ export default function Spec() {
             </div>
           </div>
         </section>
+      </div>
+      <ScrollAnimation animateIn="fadeIn">
+        <section id="create-nfts">
+          <div className="image-display">
+            <div className="image_avatar">
+              <img src="./img/Asset 4.png" className="rounded-corners main" />
+              <img src="./img/Avatar.png" className="avatar" />
+            </div>
+            <div className="image_avatar">
+              <img src="./img/Asset 5.png" className="rounded-corners main" />
+              <img src="./img/Avatar.png" className="avatar" />
+            </div>
+            <div className="image_avatar">
+              <img src="./img/Asset 6.png" className="rounded-corners main" />
+              <img src="./img/Avatar.png" className="avatar" />
+            </div>
+          </div>
+          <article>
+            <h3>CREATE AND SELL YOUR NFTS</h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero
+              deserunt, eveniet dignissimos sapiente vel architecto fugit omnis
+              aliquam deleniti amet, laboriosam dolor iste perspiciatis, eum
+              doloremque. Sapiente dolores natus voluptas.
+            </p>
+            <button className="rounded-button">Sign Up Now</button>
+          </article>
+        </section>
       </ScrollAnimation>
-    </div>
+    </>
   );
 }

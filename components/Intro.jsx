@@ -5,6 +5,7 @@ import axios from "axios";
 
 export default function Intro() {
   const {
+    rpc,
     client,
     nftAddress,
     Market,
@@ -20,7 +21,7 @@ export default function Intro() {
     { id: 2, image: "./img/Asset 1.png" },
   ]);
   async function loadNfts() {
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com");
+    const provider = new ethers.providers.JsonRpcProvider(rpc);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(
       nftMarketPlaceAddress,
@@ -34,7 +35,7 @@ export default function Intro() {
     }
     const items = await Promise.all(
       data.map(async (elem, ind) => {
-        console.log(elem.tokenId,ind)
+        console.log(elem.tokenId, ind);
         const tokenURI = await tokenContract.tokenURI(elem.tokenId);
         const meta = await axios.get(tokenURI);
         console.log(tokenURI, meta);

@@ -6,11 +6,10 @@ import Spec from "../components/Spec";
 import Web3Modal from "web3modal";
 import dynamic from "next/dynamic";
 import { Context } from "../components/Context";
-import { useState, useEffect,useContext } from "react";
-
+import { useState, useEffect, useContext } from "react";
 
 export default function Home() {
-  const Modal =dynamic(()=> import("../components/Modal"))
+  const Modal = dynamic(() => import("../components/Modal"));
   const providerOptions = {
     connect: {
       package: { mustBeMetaMask: false, silent: false, timeout: 100 },
@@ -24,7 +23,7 @@ export default function Home() {
   };
 
   const { address, errorInstance, setErrorInstance, setAddress } =
-  useContext(Context).state;
+    useContext(Context).state;
 
   async function connect() {
     try {
@@ -38,16 +37,16 @@ export default function Home() {
     }
   }
 
-  useEffect(async() => {
+  useEffect(async () => {
     await connect();
   }, [errorInstance.count]);
 
   return (
     <>
-      <Nav  />
+      <Nav />
       <Intro />
       <Spec />
-      {errorInstance.status | !address  ? (
+      {errorInstance.status | !address ? (
         <Modal>
           <div className="upload">
             <a
@@ -63,11 +62,13 @@ export default function Home() {
               &times;
             </a>
             <h5 style={{ textAlign: "center", padding: "7rem" }}>
-              {errorInstance.message?errorInstance.message:"Disconnected"}
+              {errorInstance.message ? errorInstance.message : "Disconnected"}
             </h5>
+            {console.log(errorInstance)}
             <p style={{ textAlign: "center" }}>
-              kindly Install MetaMask and Verify you on the Polygon
-              Network(TestNet)
+              {errorInstance.subtitle
+                ? errorInstance.subtitle.split("'")[1]
+                : "kindly Install MetaMask and Verify you on the Polygon Network(TestNet)"}
             </p>
           </div>
         </Modal>

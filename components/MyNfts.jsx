@@ -157,28 +157,35 @@ export default function MyNfts() {
     tx.events[0]["transactionHash"];
     router.push(`/song/${nft.id}`);
   }
+
   return (
     <>
-    {address===ownerAddress?
-      <>
-        <section>
-          <h4>Active ({nfts["Active"].length})</h4>
-          <>
-            {nfts["Active"].length === 0 && loaded === true ? (
-              <p style={{ textAlign: "center", padding: "7rem 0" }}>
-                No Available Nfts
-              </p>
-            ) : (
-              <div className="my-nfts">
-                {nfts["Active"].map((nft, i) => {
-                  return <MyNftCard nft={nft} key={"Active" + i} />;
-                })}
-              </div>
-            )}
-          </>
-        </section>
-      </>:null
-      }
+      {address === ownerAddress ? (
+        <>
+          <section>
+            <h4>Active ({nfts["Active"].length})</h4>
+            <>
+              {nfts["Active"].length === 0 && loaded === true ? (
+                <p style={{ textAlign: "center", padding: "7rem 0" }}>
+                  No Available Nfts
+                </p>
+              ) : (
+                <div className="my-nfts">
+                  {nfts["Active"].map((nft, i) => {
+                    return (
+                      <MyNftCard
+                        nft={nft}
+                        key={"Active" + i}
+                        redirect={()=>router.push(`/song/${nft.id}`)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          </section>
+        </>
+      ) : null}
       <section>
         <h4>Purchased ({nfts["purchased"].length})</h4>
         <>
@@ -193,6 +200,7 @@ export default function MyNfts() {
                   <MyNftCard
                     nft={nft}
                     key={i}
+                    admin={address === ownerAddress}
                     cancel={nft.status === "Purchased"}
                     onClickFunc={async (e) => {
                       if (nft.status === "Purchased") {
