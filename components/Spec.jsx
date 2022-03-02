@@ -1,6 +1,7 @@
 import ScrollAnimation from "react-animate-on-scroll";
 import { getAuctions } from "../utils/helper";
 import { useEffect,useState } from "react";
+import Link from "next/link";
 import MakeBid from "./makeBid";
 export default function Spec() {
 
@@ -88,7 +89,9 @@ export default function Spec() {
         <div id="list-featured">
         {auctions.length==0?<p style={{margin:"auto"}}>No Active auctions</p> 
         :auctions.map((elem,ind)=>{
-          return(<article key={ind}>
+          return(
+          <Link key={ind} href={`/auction/${elem.id}`}>
+            <article>
             <img
               className="rounded-corners"
               src={elem.meta.image}
@@ -116,7 +119,8 @@ export default function Spec() {
               </button> */}
               <MakeBid auction ={elem} />
             </div>
-          </article>)
+          </article>
+            </Link>)
         })
         }
         </div>
