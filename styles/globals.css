@@ -586,7 +586,7 @@ figcaption {
   margin-left: 0.2rem;
 }
 .center {
-  display: grid;
+  display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
@@ -1019,6 +1019,18 @@ section.flex {
     yellow 100%
   );
 }
+table a{
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: currentColor;
+}
+tr,th{
+  min-width: calc(80vw/ 5);
+  max-width: calc(80vw / 4);
+  text-align: center;
+}
+
 .btn-grad {
   text-align: center;
   text-transform: uppercase;

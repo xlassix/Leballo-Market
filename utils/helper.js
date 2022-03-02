@@ -2,14 +2,16 @@ import Market from "../artifacts/contracts/MusicMarket.sol/MusicMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Auction from "../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json"
 import { nftAddress, nftMarketPlaceAddress, auctionAddress } from "../config";
-import { ethers } from "ethers";
+import { ethers  } from "ethers";
 import { pick,map,each,reduce } from "underscore";
 import axios from "axios";
-// const rpc=`https://polygon-mumbai.infura.io/v3/${process.env.project_id}`;
-const rpc="https://rpc-mumbai.maticvigil.com";
+import Web3 from "web3";
+
+const rpc="http://localhost:8545/";
+const web3 = new Web3(rpc);
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
-  "itemId",
+  "itemId", 
   "tokenId",
   "owner",
   "price",
@@ -125,4 +127,20 @@ export async function getAuctionByItemID(id) {
   data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
   console.log(data);
   return data
+}
+
+
+export async function getLogs(id) {
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
+    const scontract = new ethers.Contract(
+      nftMarketPlaceAddress,
+      Market.abi,
+      provider
+    );
+    const contract = new web3.eth.Contract(Market.abi,nftMarketPlaceAddress);
+    const logs = await contract.getPastEvents("ArtistEvent",{ fromBlock: 0});
+    console.log(logs)
+    var results= logs.map(log => {return {"tx":log.transactionHash,...log.returnValues}})
+    console.log(results)
+    return results;
 }

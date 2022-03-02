@@ -41,12 +41,14 @@ contract AuctionFactory is ReentrancyGuard {
         uint256 indexed auctionId,
         uint256 indexed tokenId,
         uint256 amount,
-        address indexed bidder
+        address indexed bidder,
+        uint256 timestamp
     );
     event withdrawEvent(
         uint256 indexed auctionId,
         uint256 amount,
-        address indexed withdrawer
+        address indexed withdrawer,
+        uint256 timestamp
     );
 
     event AuctionEvent(
@@ -54,7 +56,8 @@ contract AuctionFactory is ReentrancyGuard {
         uint256 indexed tokenId,
         address indexed seller,
         AuctionStatus status,
-        string message
+        string message,
+        uint256 timestamp
     );
 
     address contactAddress;
@@ -81,7 +84,7 @@ contract AuctionFactory is ReentrancyGuard {
         Cancelled
     }
 
-    mapping(string => uint256) bids;
+    mapping(string => uint256) private bids;
     mapping(uint256 => uint256) public tokenIdToAuction;
     mapping(uint256 => Auction) public auctions;
 
@@ -138,7 +141,8 @@ contract AuctionFactory is ReentrancyGuard {
             tokenId,
             seller,
             AuctionStatus.Reserved,
-            "Reserved Auction"
+            "Reserved Auction",
+            block.timestamp
         );
         return auctions[_auctionCount.current()].id;
     }
@@ -172,7 +176,8 @@ contract AuctionFactory is ReentrancyGuard {
                 auctions[auctionId].tokenId,
                 auctions[auctionId].seller,
                 AuctionStatus.Started,
-                "Auction Start"
+                "Auction Start",
+                block.timestamp
             );
         }
 
@@ -183,8 +188,13 @@ contract AuctionFactory is ReentrancyGuard {
             auctionId,
             auctions[auctionId].tokenId,
             auctions[auctionId].currentBid,
-            auctions[auctionId].highestBidder
+            auctions[auctionId].highestBidder,
+            block.timestamp
         );
+    }
+
+    function amountInAuction(uint256 auctionId) external view returns(uint) {
+        return bids[createUniqueBidEntry(msg.sender, auctionId)];
     }
 
     function withdraw(uint256 auctionId) external payable nonReentrant {
@@ -194,7 +204,12 @@ contract AuctionFactory is ReentrancyGuard {
         bids[createUniqueBidEntry(msg.sender, auctionId)] = 0;
         (bool sent, ) = payable(msg.sender).call{value: auctionBalance}("");
         assert(sent);
-        emit withdrawEvent(auctionId, auctionBalance, msg.sender);
+        emit withdrawEvent(
+            auctionId,
+            auctionBalance,
+            msg.sender,
+            block.timestamp
+        );
     }
 
     function closeAuction(uint256 auctionId) external {
@@ -231,7 +246,8 @@ contract AuctionFactory is ReentrancyGuard {
             auctions[auctionId].tokenId,
             auctions[auctionId].seller,
             AuctionStatus.Closed,
-            "Auction Closed"
+            "Auction Closed",
+            block.timestamp
         );
     }
 
