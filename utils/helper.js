@@ -7,7 +7,7 @@ import { pick, map, each, reduce } from "underscore";
 import axios from "axios";
 import Web3 from "web3";
 
-const rpc = "http://localhost:8545/";
+const rpc = "https://rpc-mumbai.maticvigil.com";
 const web3 = new Web3(rpc);
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
@@ -158,13 +158,14 @@ export async function getAuctionByItemID(id) {
 }
 
 export async function getLogs(id) {
-  const provider = new ethers.providers.JsonRpcProvider(rpc);
+  const latest = await web3.eth.getBlockNumber();
   const contract = new web3.eth.Contract(Auction.abi, auctionAddress);
   const logs = await contract.getPastEvents("bidEvent", {
     filter: {
       auctionId: id,
     },
-    fromBlock: 0,
+    fromBlock: latest-1000,
+    toBlock: latest
   });
   console.log(logs);
   var results = logs.map((log) => {
