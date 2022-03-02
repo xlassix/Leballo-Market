@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { Context } from "./Context";
 import { getAuction } from "../utils/helper";
-import BuySong from "./BuySong";
+import WithdrawAuction from "./WithdrawAuction";
 import MakeBid from "./makeBid";
 
 export default function AuctionDetailNft({ id }) {
@@ -71,13 +71,12 @@ export default function AuctionDetailNft({ id }) {
               </ul>
               <p>{nft.meta.description}</p>
             </div>
-            <div className="btn-group flex">
               {(nft.status == 2|| nft.status == 1) && parseInt(nft.startAt)<(new Date().getTime()/1000) &&  parseInt(nft.endAt)>(new Date().getTime()/1000) ? (
                 <>
                   <MakeBid auction={nft} />
                 </>
               ) : null}
-            </div>
+            <WithdrawAuction id={nft.id}/>
           </div>
         </section>
       ) : (

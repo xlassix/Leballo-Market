@@ -57,7 +57,7 @@ export default function MakeBid({ auction, itemId }) {
       console.log(transaction);
 
       await transaction.wait();
-      router.push(`/song/${_auction.tokenId.toString()}`);
+      router.push(`/auction/${_auction.id.toString()}`);
     } catch (e) {
       console.log(e);
       setErrorInstance({
@@ -118,7 +118,7 @@ export default function MakeBid({ auction, itemId }) {
           Make a bid
         </a>
       ) : (
-        <a onClick={_endBid} className="rounded-button btn-border">
+        <a href="#" onClick={_endBid} className="rounded-button btn-border">
           End Bid
         </a>
       )}
