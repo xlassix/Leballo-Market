@@ -1154,6 +1154,9 @@ ul.flex > li:first-child {
 #profile .details > h2 {
   margin-bottom: 0.5rem;
 }
+.flex-col{
+  flex-direction: column;
+}
 
 #profile .details > div > img {
   max-height: 2rem;
@@ -1237,7 +1240,6 @@ ul.flex > li:first-child {
   justify-content: space-between;
   font-weight: 500;
 }
-
 .center-div {
   margin: 0 auto;
 }
@@ -1337,6 +1339,7 @@ ul.flex > li:first-child {
   margin: 0;
 }
 
+
 .upload > a {
   display: block;
   margin-bottom: 2rem;
@@ -1350,6 +1353,10 @@ ul.flex > li:first-child {
   --body-color: var(--color-light-btn2);
   --text-color: var(--color-dark-text);
   --border-color: none;
+}
+
+.nodata{
+  margin: 7rem auto;
 }
 @media (max-width: 950px) {
   #top-collection {

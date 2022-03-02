@@ -1,17 +1,17 @@
 import Market from "../artifacts/contracts/MusicMarket.sol/MusicMarket.json";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
-import Auction from "../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json"
+import Auction from "../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json";
 import { nftAddress, nftMarketPlaceAddress, auctionAddress } from "../config";
-import { ethers  } from "ethers";
-import { pick,map,each,reduce } from "underscore";
+import { ethers } from "ethers";
+import { pick, map, each, reduce } from "underscore";
 import axios from "axios";
 import Web3 from "web3";
 
-const rpc="http://localhost:8545/";
+const rpc = "http://localhost:8545/";
 const web3 = new Web3(rpc);
 const artistKeys = ["id", "artistName", "url"];
 const songKeys = [
-  "itemId", 
+  "itemId",
   "tokenId",
   "owner",
   "price",
@@ -26,9 +26,8 @@ const AuctionKeys = [
   "currentBid",
   "startAt",
   "endAt",
-  "status"
+  "status",
 ];
-
 
 export async function getAlbums() {
   const provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -57,7 +56,7 @@ export async function getAlbum(id) {
     Market.abi,
     provider
   );
-  return pick(await marketContract.getAlbum(id),["_album","_artists"]);
+  return pick(await marketContract.getAlbum(id), ["_album", "_artists"]);
 }
 
 export async function getArtists() {
@@ -79,16 +78,21 @@ export async function getSong(id) {
     Market.abi,
     provider
   );
-  console.log(id)
-  var temp=await marketContract.itemIdToSong(id);
-  const data=pick(temp, songKeys)
-  data["formatted_price"] = ethers.utils.formatEther(data["price"].toString())
-  data["meta"]=(await getMetadata(data.tokenId.toString())).data
-  data["album"]=await getAlbum(data.albumId.toString())
-  data["artistUrl"]=await(await (axios.get(data.album["_artists"].filter(elem=>elem.id.toString()==data.artistId.toString())[0]["url"]))).data.image
-  return data
+  console.log(id);
+  var temp = await marketContract.itemIdToSong(id);
+  const data = pick(temp, songKeys);
+  data["formatted_price"] = ethers.utils.formatEther(data["price"].toString());
+  data["meta"] = (await getMetadata(data.tokenId.toString())).data;
+  data["album"] = await getAlbum(data.albumId.toString());
+  data["artistUrl"] = await (
+    await axios.get(
+      data.album["_artists"].filter(
+        (elem) => elem.id.toString() == data.artistId.toString()
+      )[0]["url"]
+    )
+  ).data.image;
+  return data;
 }
-
 
 export async function getMetadata(tokenId) {
   const provider = new ethers.providers.JsonRpcProvider(rpc);
@@ -103,15 +107,37 @@ export async function getAuctions() {
     auctionAddress,
     Auction.abi,
     provider
-    );
-    const activeAuction= (await auctionContract.getAuctions()).filter(elem=>parseInt(elem.status)!=0)
-    var data = await Promise.all(activeAuction.map(async (elem)=>{
-      const data=pick(elem, AuctionKeys)
-      data.meta= (await getMetadata(elem.tokenId.toString())).data
-      data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
-      return data
-    }));
-  return data
+  );
+  const activeAuction = (await auctionContract.getAuctions()).filter(
+    (elem) => parseInt(elem.status) != 0
+  );
+  var data = await Promise.all(
+    activeAuction.map(async (elem) => {
+      const data = pick(elem, AuctionKeys);
+      data.meta = (await getMetadata(elem.tokenId.toString())).data;
+      data["formatted_price"] = ethers.utils.formatEther(
+        data["currentBid"].toString()
+      );
+      return data;
+    })
+  );
+  return data;
+}
+export async function getAuction(id) {
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
+  const auctionContract = new ethers.Contract(
+    auctionAddress,
+    Auction.abi,
+    provider
+  );
+  const auction = await auctionContract.auctions(id);
+  const data = pick(auction, AuctionKeys);
+  data.meta = (await getMetadata(auction.tokenId.toString())).data;
+  data["formatted_price"] = ethers.utils.formatEther(
+    data["currentBid"].toString()
+  );
+  console.log(data);
+  return data;
 }
 
 export async function getAuctionByItemID(id) {
@@ -120,27 +146,34 @@ export async function getAuctionByItemID(id) {
     auctionAddress,
     Auction.abi,
     provider
-    );
-  const auction= (await auctionContract.getAuctionByItemId(id))
-  const data=pick(auction, AuctionKeys)
-  data.meta= (await getMetadata(auction.tokenId.toString())).data
-  data["formatted_price"] = ethers.utils.formatEther(data["currentBid"].toString())
+  );
+  const auction = await auctionContract.getAuctionByItemId(id);
+  const data = pick(auction, AuctionKeys);
+  data.meta = (await getMetadata(auction.tokenId.toString())).data;
+  data["formatted_price"] = ethers.utils.formatEther(
+    data["currentBid"].toString()
+  );
   console.log(data);
-  return data
+  return data;
 }
-
 
 export async function getLogs(id) {
   const provider = new ethers.providers.JsonRpcProvider(rpc);
-    const scontract = new ethers.Contract(
-      nftMarketPlaceAddress,
-      Market.abi,
-      provider
-    );
-    const contract = new web3.eth.Contract(Market.abi,nftMarketPlaceAddress);
-    const logs = await contract.getPastEvents("ArtistEvent",{ fromBlock: 0});
-    console.log(logs)
-    var results= logs.map(log => {return {"tx":log.transactionHash,...log.returnValues}})
-    console.log(results)
-    return results;
+  const contract = new web3.eth.Contract(Auction.abi, auctionAddress);
+  const logs = await contract.getPastEvents("bidEvent", {
+    filter: {
+      auctionId: id,
+    },
+    fromBlock: 0,
+  });
+  console.log(logs);
+  var results = logs.map((log) => {
+    return {
+      tx: log.transactionHash,
+      ...log.returnValues,
+      amount: ethers.utils.formatEther(log.returnValues["amount"].toString()),
+    };
+  });
+  console.log("ddd", results);
+  return results;
 }
