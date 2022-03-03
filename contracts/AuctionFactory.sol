@@ -147,6 +147,9 @@ contract AuctionFactory is ReentrancyGuard {
         return auctions[_auctionCount.current()].id;
     }
 
+    /**
+     * @dev Make Bid in an Active Auction
+     */
     function makeBid(uint256 auctionId) external payable nonReentrant {
         require(
             auctions[auctionId].startAt <= block.timestamp &&
@@ -193,6 +196,9 @@ contract AuctionFactory is ReentrancyGuard {
         );
     }
 
+    /**
+     * @dev View Funds allocation in auction
+     */
     function amountInAuction(uint256 auctionId) external view returns(uint) {
         return bids[createUniqueBidEntry(msg.sender, auctionId)];
     }
@@ -212,6 +218,10 @@ contract AuctionFactory is ReentrancyGuard {
         );
     }
 
+
+    /**
+     * @dev Close Auction
+     */
     function closeAuction(uint256 auctionId) external {
         require(
             auctions[auctionId].endAt < block.timestamp,
