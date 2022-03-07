@@ -25,7 +25,7 @@ contract MusicMarket is ReentrancyGuard {
     uint256 private amount;
     uint256 public listingPrice = 0.025 ether;
 
-    //Defined Enums
+    /*******************Defined Enums*******************/
     enum SongStatus {
         Active,
         Sold,
@@ -38,7 +38,7 @@ contract MusicMarket is ReentrancyGuard {
         Verified
     }
 
-    //Struct definitions
+    /*******************Struct definitions*******************/
     struct Song {
         uint256 itemId;
         uint256 tokenId;
@@ -66,13 +66,15 @@ contract MusicMarket is ReentrancyGuard {
         uint256 soldSongs;
     }
 
-    //Mapping Definition
+    /*******************Mapping Definition*******************/
     mapping(uint256 => Song) public itemIdToSong;
     mapping(uint256 => Artist) public artists;
     mapping(uint256 => Album) private _albums;
     mapping(uint256 => uint256[]) private _albumToArtistMapping;
     mapping(address => uint256) private ownerToNftCount;
 
+
+    /*******************Event Declaration*******************/
     event SongEvent(
         uint256 indexed itemId,
         uint256 indexed tokenId,
