@@ -37,6 +37,7 @@ interface IMusicMarketPlace {
 }
 
 contract AuctionFactory is ReentrancyGuard {
+    /*******************Events Definition*******************/
     event bidEvent(
         uint256 indexed auctionId,
         uint256 indexed tokenId,
@@ -60,12 +61,18 @@ contract AuctionFactory is ReentrancyGuard {
         uint256 timestamp
     );
 
+    /*******************variable  Definition*******************/
     address contactAddress;
     address nftMarket;
     using Counters for Counters.Counter;
     Counters.Counter private _openAuctionCount;
     Counters.Counter private _auctionCount;
+    mapping(string => uint256) private bids;
+    mapping(uint256 => uint256) public tokenIdToAuction;
+    mapping(uint256 => Auction) public auctions;
 
+
+    /*******************Struct Definition*******************/
     struct Auction {
         uint256 id;
         uint256 tokenId;
@@ -77,6 +84,8 @@ contract AuctionFactory is ReentrancyGuard {
         AuctionStatus status;
     }
 
+
+    /*******************Enum Definition*******************/
     enum AuctionStatus {
         Closed,
         Started,
@@ -84,9 +93,6 @@ contract AuctionFactory is ReentrancyGuard {
         Cancelled
     }
 
-    mapping(string => uint256) private bids;
-    mapping(uint256 => uint256) public tokenIdToAuction;
-    mapping(uint256 => Auction) public auctions;
 
     constructor(address _contactAddress, address nft) {
         contactAddress = _contactAddress;
@@ -112,6 +118,10 @@ contract AuctionFactory is ReentrancyGuard {
         return string(abi.encodePacked(addr, auctionId));
     }
 
+
+    /**
+     * @dev create Auction 
+     */
     function createAuction(
         uint256 startAt,
         uint256 endAt,
