@@ -1,17 +1,29 @@
 const { expect } = require("chai");
 
+let _market, market, nft, _nft,nftMarketAddress,marketplaceAddress;
+
+function generateRandomAddressSigner() {
+  return new ethers.Wallet.createRandom();
+}
+beforeEach(async () => {
+  [owner, account2, account3, account4] = await ethers.getSigners();
+  owner = owner.address;
+
+  _market = await ethers.getContractFactory("MusicMarket");
+  market = await _market.deploy();
+  await market.deployed();
+  marketplaceAddress = market.address;
+
+  _nft = await ethers.getContractFactory("LebelloNFT1155");
+  nft = await _nft.deploy(marketplaceAddress);
+  await nft.deployed();
+  nftMarketAddress = nft.address;
+  console.log(`Market Contract deployed at : ${market.address}`);
+  console.log(`NFT Contract deployed at : ${nft.address}`);
+});
+
 describe("MusicNft market", async function () {
   it("Create Artist", async function () {
-    const _market = await ethers.getContractFactory("MusicMarket");
-    const market = await _market.deploy();
-    await market.deployed();
-    const marketplaceAddress = market.address;
-
-    const _nft = await ethers.getContractFactory("NFT");
-    const nft = await _nft.deploy(marketplaceAddress);
-    await nft.deployed();
-    const nftMarketAddress = nft.address;
-
     const eminemURI =
       "https://i.iheart.com/v3/surl/aHR0cDovL2ltYWdlLmloZWFydC5jb20vaW1hZ2VzL3JvdmkvNTAwLzAwMDQvMzUxL01JMDAwNDM1MTA4My5qcGc=?ops=fit%28720%2C720%29&sn=eGtleWJhc2UyMDIxMTExMDpdLNoz7zAkGSCGc0l-UhYU-iWVePRDxp115-dx0ZyJSg%3D%3D&surrogate=1cOXl179JY-syhxYSCX6Q1a_Mcu6UO8d-F4oJzpZf1hcUbJr4aImwtcKGFetygNPKx2a2jKgDrRWeMd-3Y81NovggdU4GlcJ7qBJw-Qox0WKye-fZ5aI3yh6uTGfWsn30qRx1dDyCTY4viE2NMODseBXqcXMx_rxHVFJCkuiiORNR53VluNY_iBg3DyjMX2N8_v5ZQlRXLm-v9cwDlhLBJFDedk%3D";
     const nfURI =
@@ -36,15 +48,6 @@ describe("MusicNft market", async function () {
     expect(tx["artistName"]).to.equal("NF");
   });
   it("Create Albums", async function () {
-    const _market = await ethers.getContractFactory("MusicMarket");
-    const market = await _market.deploy();
-    await market.deployed();
-    const marketplaceAddress = market.address;
-
-    const _nft = await ethers.getContractFactory("NFT");
-    const nft = await _nft.deploy(marketplaceAddress);
-    await nft.deployed();
-    const nftMarketAddress = nft.address;
 
     //Create Artist
     const eminemURI =
@@ -89,22 +92,9 @@ describe("MusicNft market", async function () {
       nfData["artistId"].toString(),
     ]);
   });
-  it("an Artist Must be on Album to add a song", async function () {
-
-  });
-  it("reject Songs from Artist", async function () {
-
-  });
+  it("an Artist Must be on Album to add a song", async function () {});
+  it("reject Songs from Artist", async function () {});
   it("Should create and execute and list Songs", async function () {
-    const _market = await ethers.getContractFactory("MusicMarket");
-    const market = await _market.deploy();
-    await market.deployed();
-    const marketplaceAddress = market.address;
-
-    const _nft = await ethers.getContractFactory("NFT");
-    const nft = await _nft.deploy(marketplaceAddress);
-    await nft.deployed();
-    const nftAddress = nft.address;
 
     //Create Artist
     const eminemURI =
@@ -136,21 +126,20 @@ describe("MusicNft market", async function () {
     expect(tx["artistName"]).to.equal("NF");
 
     let token1 = await nft.createToken(
-      "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png"
+      "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png",20
     );
     let token2 = await nft.createToken(
-      "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_92x30dp.png"
+      "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_92x30dp.png",20
     );
     let token3 = await nft.createToken(
-      "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_92x30dp.png"
+      "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_92x30dp.png",20
     );
-    let tx1 = await token1.wait();
-    let tx2 = await token2.wait();
-    let tx3 = await token3.wait();
+    let [tx1,tx2,tx3] = await Promise.all([ token1.wait(),token2.wait(),token3.wait()]);
 
-    let tokenId1 = tx1.events[0].args[2].toNumber();
-    let tokenId2 = tx2.events[0].args[2].toNumber();
-    let tokenId3 = tx3.events[0].args[2].toNumber();
+
+    let tokenId1 = tx1.events[0].args[3].toNumber();
+    let tokenId2 = tx2.events[0].args[3].toNumber();
+    let tokenId3 = tx3.events[0].args[3].toNumber();
 
     const auction_price = ethers.utils.parseUnits("100", "ether");
 
@@ -177,32 +166,31 @@ describe("MusicNft market", async function () {
     listingPrice = listingPrice.toString();
 
     tx = await market.createSong(
-      nftAddress,
+      nftMarketAddress,
       tokenId1,
       album1["albumId"].toString(),
       eminemData["artistId"].toString(),
-      auction_price,
+      auction_price
     );
     var data1 = await tx.wait();
 
-
     tx = await market.createSong(
-      nftAddress,
+      nftMarketAddress,
       tokenId2,
       album1["albumId"].toString(),
       eminemData["artistId"].toString(),
-      auction_price,
+      auction_price
     );
     tx = await market.getItemByTokenId(tokenId2);
 
-    const data= await market.getAlbum(album1["albumId"].toString());
+    const data = await market.getAlbum(album1["albumId"].toString());
     expect(data["_album"]["mintedSongs"].toString()).to.equal("2");
 
-    const [_, buyerAddress] = await ethers.getSigners();
-    tx=await market
-      .connect(buyerAddress)
-      .createSongSale(nftAddress, 1, { value: auction_price });
+    // const [_, buyerAddress] = await ethers.getSigners();
+    // tx = await market
+    //   .connect(buyerAddress)
+    //   .createSongSale(nftAddress, 1, { value: auction_price });
 
-    tx= await  tx.wait()
+    // tx = await tx.wait();
   });
 });

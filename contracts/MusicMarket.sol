@@ -1,8 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./NFT1155.sol";
 
 interface IAuctionFactory {
     function createAuction(
@@ -16,6 +17,7 @@ interface IAuctionFactory {
 
 contract MusicMarket is ReentrancyGuard {
     using Counters for Counters.Counter;
+    LebelloNFT1155 nftContract;
     Counters.Counter private _songCount;
     Counters.Counter private _musicMarketCount;
     Counters.Counter private _artistCount;
@@ -42,7 +44,7 @@ contract MusicMarket is ReentrancyGuard {
     struct Song {
         uint256 itemId;
         uint256 tokenId;
-        address musicContract;
+        uint256 amountMinted;
         address payable owner;
         address payable seller;
         uint256 price;
@@ -73,12 +75,11 @@ contract MusicMarket is ReentrancyGuard {
     mapping(uint256 => uint256[]) private _albumToArtistMapping;
     mapping(address => uint256) private ownerToNftCount;
 
-
     /*******************Event Declaration*******************/
     event SongEvent(
         uint256 indexed itemId,
         uint256 indexed tokenId,
-        address musicContract,
+        uint256 _amount,
         address owner,
         address seller,
         uint256 price,
@@ -120,6 +121,7 @@ contract MusicMarket is ReentrancyGuard {
      */
     constructor() {
         owner = payable(msg.sender);
+        nftContract = new LebelloNFT1155();
     }
 
     /**
@@ -159,7 +161,7 @@ contract MusicMarket is ReentrancyGuard {
 
     function withdraw() external onlyOwner {
         bool sent = owner.send(amount);
-        amount=0;
+        amount = 0;
         assert(sent);
     }
 
@@ -214,23 +216,22 @@ contract MusicMarket is ReentrancyGuard {
     }
 
     function createSong(
-        address musicContract,
-        uint256 tokenId,
         uint256 albumId,
         uint256 artistId,
-        uint256 price
+        uint256 price,
+        string calldata uri,
+        uint256 _amount
     ) external onlyOwner nonReentrant {
         require(price > 0);
-        require(tokenId >= _songCount.current(), "invalid TokenId");
         require(albumId <= _albumCount.current(), "Invalid AlbumId");
-
         _songCount.increment();
         uint256 currentItemId = _songCount.current();
+        uint256 tokenId = nftContract.createToken(uri, _amount);
         Album storage _album = _albums[albumId];
         itemIdToSong[currentItemId] = Song(
             currentItemId,
             tokenId,
-            musicContract,
+            _amount,
             payable(address(0)),
             payable(msg.sender),
             price,
@@ -240,11 +241,10 @@ contract MusicMarket is ReentrancyGuard {
             SongStatus.Active
         );
         _album.mintedSongs += 1;
-        IERC721(musicContract).transferFrom(msg.sender, address(this), tokenId);
         emit SongEvent(
             currentItemId,
             tokenId,
-            musicContract,
+            _amount,
             address(0),
             msg.sender,
             price,
@@ -262,36 +262,42 @@ contract MusicMarket is ReentrancyGuard {
     function musicTransfer(
         address nftAddress,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 _amount
     ) public {
         Song storage item = itemIdToSong[getItemByTokenId(tokenId).itemId];
-        require(msg.sender == item.owner );
-        IERC721(nftAddress).transferFrom(item.owner, to, tokenId);
+        require(msg.sender == item.owner);
+        IERC1155(nftAddress).safeTransferFrom(
+            item.owner,
+            to,
+            tokenId,
+            _amount,
+            ""
+        );
         ownerToNftCount[item.owner]--;
         ownerToNftCount[to]++;
         item.status = SongStatus.Sold;
         item.owner = payable(to);
     }
 
-
     /**
      * @dev Buy Nfts
      */
-    function BuySong(address musicContract, uint256 tokenId)
-        public
-        payable
-        nonReentrant
-    {
+    function BuySong(
+        address musicContract,
+        uint256 tokenId,
+        uint256 _amount
+    ) public payable nonReentrant {
         Song memory item = getItemByTokenId(tokenId);
         require(item.status == SongStatus.Active, "Items not Listed");
         require(msg.value >= item.price, "Insufficent funds");
-        musicTransfer(musicContract, msg.sender, tokenId);
+        musicTransfer(musicContract, msg.sender, tokenId, _amount);
         _currentListings.decrement();
         item.owner.transfer(item.price);
         emit SongEvent(
             item.itemId,
             tokenId,
-            musicContract,
+            _amount,
             msg.sender,
             item.owner,
             item.price,
@@ -303,17 +309,23 @@ contract MusicMarket is ReentrancyGuard {
         );
     }
 
-    function createSongSale(address musicContract, uint256 itemId)
-        public
-        payable
-        nonReentrant
-    {
+    function createSongSale(
+        address musicContract,
+        uint256 itemId,
+        uint256 _amount
+    ) public payable nonReentrant {
         Song memory currentToken = itemIdToSong[itemId];
         uint256 price = currentToken.price;
         require(msg.value >= price);
         uint256 tokenId = currentToken.tokenId;
 
-        IERC721(musicContract).transferFrom(address(this), msg.sender, tokenId);
+        IERC1155(musicContract).safeTransferFrom(
+            address(this),
+            msg.sender,
+            tokenId,
+            _amount,
+            ""
+        );
         ownerToNftCount[msg.sender]++;
         currentToken.status = SongStatus.Sold;
         currentToken.owner = payable(msg.sender);
@@ -323,7 +335,7 @@ contract MusicMarket is ReentrancyGuard {
         emit SongEvent(
             itemId,
             tokenId,
-            musicContract,
+            itemIdToSong[itemId].amountMinted,
             itemIdToSong[itemId].owner,
             itemIdToSong[itemId].seller,
             price,
@@ -341,11 +353,12 @@ contract MusicMarket is ReentrancyGuard {
         uint256 startAt,
         uint256 endAt,
         uint256 startBidPrice,
-        uint256 tokenId
+        uint256 tokenId,
+        uint256 _amount
     ) external {
         Song storage _song = itemIdToSong[getItemByTokenId(tokenId).itemId];
         require(msg.sender == _song.owner, "Not Owner");
-        musicTransfer(nftAddress, auctionMarket, tokenId);
+        musicTransfer(nftAddress, auctionMarket, tokenId, _amount);
         _song.status = SongStatus.OnBid;
         uint256 auctionId = IAuctionFactory(auctionMarket).createAuction(
             startAt,
@@ -366,7 +379,6 @@ contract MusicMarket is ReentrancyGuard {
     }
 
     function listItem(
-        address musicContract,
         uint256 itemId,
         uint256 price
     ) public payable {
@@ -385,7 +397,7 @@ contract MusicMarket is ReentrancyGuard {
         emit SongEvent(
             itemId,
             tokenId,
-            musicContract,
+            currentToken.amountMinted,
             msg.sender,
             owner,
             price,
@@ -397,7 +409,7 @@ contract MusicMarket is ReentrancyGuard {
         );
     }
 
-    function CancelItem(address musicContract, uint256 itemId)
+    function CancelItem(uint256 itemId,uint _amount)
         public
         payable
         nonReentrant
@@ -414,7 +426,7 @@ contract MusicMarket is ReentrancyGuard {
         emit SongEvent(
             itemId,
             tokenId,
-            musicContract,
+            _amount,
             msg.sender,
             owner,
             currentToken.price,

@@ -164,8 +164,8 @@ export async function getLogs(id) {
     filter: {
       auctionId: id,
     },
-    fromBlock: latest-1000,
-    toBlock: latest
+    fromBlock: latest - 1000,
+    toBlock: latest,
   });
   console.log(logs);
   var results = logs.map((log) => {

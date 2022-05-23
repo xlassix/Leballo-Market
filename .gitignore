@@ -49,3 +49,12 @@ artifacts/contracts/bid.sol/IERC721.json
 .vscode/configurationCache.log
 .vscode/dryrun.log
 .vscode/targets.log
+artifacts/@openzeppelin/contracts/access/Ownable.sol/Ownable.json
+artifacts/@openzeppelin/contracts/token/ERC1155/ERC1155.sol/ERC1155.json
+artifacts/@openzeppelin/contracts/token/ERC1155/IERC1155.sol/IERC1155.json
+artifacts/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol/IERC1155Receiver.json
+artifacts/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol/IERC1155MetadataURI.json
+artifacts/contracts/AuctionFactory.sol/AuctionFactory.json
+artifacts/contracts/AuctionFactory.sol/Music.json
+artifacts/contracts/MusicMarket.sol/MusicMarket.json
+artifacts/contracts/NFT1155.sol/LebelloNFT1155.json
